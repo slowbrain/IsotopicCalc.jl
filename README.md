@@ -36,7 +36,7 @@ Mass [amu]      Abbundance [%]
 61.049465       0.006668
 60.049437       0.001236
 Found 8 isotopic masses for 1.0e-5 abundance limit.
+```
 
-## Citing
-
+### Citing
 See [`CITATION.bib`](CITATION.bib) for the relevant reference(s).
