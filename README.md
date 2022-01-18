@@ -1,10 +1,10 @@
-# IsotopicCalc
+## IsotopicCalc
 
 <!-- [![Coverage](https://codecov.io/gh/slowbrain/IsotopicCalc.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/slowbrain/IsotopicCalc.jl)
 [![PkgEval](https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/I/IsotopicCalc.svg)](https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/report.html) -->
 
 This package is first relatively simple atempt to calculate monoisotopic mass and/or isotopic pattern for any given chemical formula. The reverse function to determine the formula from given molecular mass is yet to be implemented.
-
+### Installation
 To install run one of the following commands:
 ```julia
 ]add IsotopicCalc
@@ -14,7 +14,7 @@ or
 using Pkg; Pkg.add("IsotopicCalc.jl")
 ```
 
-## Usage
+### Usage
 ```julia
 using IsotopicCalc
 
