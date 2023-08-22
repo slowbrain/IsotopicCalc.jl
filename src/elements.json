@@ -1,1 +1,1641 @@
-{"H":{"Name":"Hydrogen","Symbol":["1H","2H"],"Relative Atomic Mass":[1.00782503223,2.01410177812],"Isotopic Composition":[0.999885,0.000115]},"He":{"Name":"Helium","Symbol":["4He"],"Relative Atomic Mass":[4.00260325413],"Isotopic Composition":[0.99999866]},"Li":{"Name":"Lithium","Symbol":["6Li","7Li"],"Relative Atomic Mass":[6.0151228874,7.0160034366],"Isotopic Composition":[0.0759,0.9241]},"Be":{"Name":"Beryllium","Symbol":["9Be"],"Relative Atomic Mass":[9.012183065],"Isotopic Composition":[1.0]},"B":{"Name":"Boron","Symbol":["10B","11B"],"Relative Atomic Mass":[10.01293695,11.00930536],"Isotopic Composition":[0.199,0.801]},"C":{"Name":"Carbon","Symbol":["12C","13C"],"Relative Atomic Mass":[12.0,13.00335483507],"Isotopic Composition":[0.9893,0.0107]},"N":{"Name":"Nitrogen","Symbol":["14N","15N"],"Relative Atomic Mass":[14.00307400443,15.00010889888],"Isotopic Composition":[0.99636,0.00364]},"O":{"Name":"Oxygen","Symbol":["16O","17O","18O"],"Relative Atomic Mass":[15.99491461957,16.9991317565,17.99915961286],"Isotopic Composition":[0.99757,0.00038,0.00205]},"F":{"Name":"Fluorine","Symbol":["19F"],"Relative Atomic Mass":[18.99840316273],"Isotopic Composition":[1.0]},"Ne":{"Name":"Neon","Symbol":["20Ne","21Ne","22Ne"],"Relative Atomic Mass":[19.9924401762,20.993846685,21.991385114],"Isotopic Composition":[0.9048,0.0027,0.0925]},"Na":{"Name":"Sodium","Symbol":["23Na"],"Relative Atomic Mass":[22.989769282],"Isotopic Composition":[1.0]},"Mg":{"Name":"Magnesium","Symbol":["24Mg","25Mg","26Mg"],"Relative Atomic Mass":[23.985041697,24.985836976,25.982592968],"Isotopic Composition":[0.7899,0.1,0.1101]},"Al":{"Name":"Aluminum","Symbol":["27Al"],"Relative Atomic Mass":[26.98153853],"Isotopic Composition":[1.0]},"Si":{"Name":"Silicon","Symbol":["28Si","29Si","30Si"],"Relative Atomic Mass":[27.97692653465,28.9764946649,29.973770136],"Isotopic Composition":[0.92223,0.04685,0.03092]},"P":{"Name":"Phosphorus","Symbol":["31P"],"Relative Atomic Mass":[30.97376199842],"Isotopic Composition":[1.0]},"S":{"Name":"Sulfur","Symbol":["32S","33S","34S","36S"],"Relative Atomic Mass":[31.9720711744,32.9714589098,33.967867004,35.96708071],"Isotopic Composition":[0.9499,0.0075,0.0425,0.0001]},"Cl":{"Name":"Chlorine","Symbol":["35Cl","37Cl"],"Relative Atomic Mass":[34.968852682,36.965902602],"Isotopic Composition":[0.7576,0.2424]},"Ar":{"Name":"Argon","Symbol":["36Ar","38Ar","40Ar"],"Relative Atomic Mass":[35.967545105,37.96273211,39.9623831237],"Isotopic Composition":[0.003336,0.000629,0.996035]},"K":{"Name":"Potassium","Symbol":["39K","40K","41K"],"Relative Atomic Mass":[38.9637064864,39.963998166,40.9618252579],"Isotopic Composition":[0.932581,0.000117,0.067302]},"Ca":{"Name":"Calcium","Symbol":["40Ca","42Ca","43Ca","44Ca","46Ca","48Ca"],"Relative Atomic Mass":[39.962590863,41.95861783,42.95876644,43.95548156,45.953689,47.95252276],"Isotopic Composition":[0.96941,0.00647,0.00135,0.02086,4.0e-5,0.00187]},"Sc":{"Name":"Scandium","Symbol":["45Sc"],"Relative Atomic Mass":[44.95590828],"Isotopic Composition":[1.0]},"Ti":{"Name":"Titanium","Symbol":["46Ti","47Ti","48Ti","49Ti","50Ti"],"Relative Atomic Mass":[45.95262772,46.95175879,47.94794198,48.94786568,49.94478689],"Isotopic Composition":[0.0825,0.0744,0.7372,0.0541,0.0518]},"V":{"Name":"Vanadium","Symbol":["50V","51V"],"Relative Atomic Mass":[49.94715601,50.94395704],"Isotopic Composition":[0.0025,0.9975]},"Cr":{"Name":"Chromium","Symbol":["50Cr","52Cr","53Cr","54Cr"],"Relative Atomic Mass":[49.94604183,51.94050623,52.94064815,53.93887916],"Isotopic Composition":[0.04345,0.83789,0.09501,0.02365]},"Mn":{"Name":"Manganese","Symbol":["55Mn"],"Relative Atomic Mass":[54.93804391],"Isotopic Composition":[1.0]},"Fe":{"Name":"Iron","Symbol":["54Fe","56Fe","57Fe","58Fe"],"Relative Atomic Mass":[53.93960899,55.93493633,56.93539284,57.93327443],"Isotopic Composition":[0.05845,0.91754,0.02119,0.00282]},"Co":{"Name":"Cobalt","Symbol":["59Co"],"Relative Atomic Mass":[58.93319429],"Isotopic Composition":[1.0]},"Ni":{"Name":"Nickel","Symbol":["58Ni","60Ni","61Ni","62Ni","64Ni"],"Relative Atomic Mass":[57.93534241,59.93078588,60.93105557,61.92834537,63.92796682],"Isotopic Composition":[0.68077,0.26223,0.011399,0.036346,0.009255]},"Cu":{"Name":"Copper","Symbol":["63Cu","65Cu"],"Relative Atomic Mass":[62.92959772,64.9277897],"Isotopic Composition":[0.6915,0.3085]},"Zn":{"Name":"Zinc","Symbol":["64Zn","66Zn","67Zn","68Zn","70Zn"],"Relative Atomic Mass":[63.92914201,65.92603381,66.92712775,67.92484455,69.9253192],"Isotopic Composition":[0.4917,0.2773,0.0404,0.1845,0.0061]},"Ga":{"Name":"Gallium","Symbol":["69Ga","71Ga"],"Relative Atomic Mass":[68.9255735,70.92470258],"Isotopic Composition":[0.60108,0.39892]},"Ge":{"Name":"Germanium","Symbol":["70Ge","72Ge","73Ge","74Ge","76Ge"],"Relative Atomic Mass":[69.92424875,71.922075826,72.923458956,73.921177761,75.921402726],"Isotopic Composition":[0.2057,0.2745,0.0775,0.365,0.0773]},"As":{"Name":"Arsenic","Symbol":["75As"],"Relative Atomic Mass":[74.92159457],"Isotopic Composition":[1.0]},"Se":{"Name":"Selenium","Symbol":["74Se","76Se","77Se","78Se","80Se","82Se"],"Relative Atomic Mass":[73.922475934,75.919213704,76.919914154,77.91730928,79.9165218,81.9166995],"Isotopic Composition":[0.0089,0.0937,0.0763,0.2377,0.4961,0.0873]},"Br":{"Name":"Bromine","Symbol":["79Br","81Br"],"Relative Atomic Mass":[78.9183376,80.9162897],"Isotopic Composition":[0.5069,0.4931]},"Kr":{"Name":"Krypton","Symbol":["78Kr","80Kr","82Kr","83Kr","84Kr","86Kr"],"Relative Atomic Mass":[77.92036494,79.91637808,81.91348273,82.91412716,83.9114977282,85.9106106269],"Isotopic Composition":[0.00355,0.02286,0.11593,0.115,0.56987,0.17279]},"Rb":{"Name":"Rubidium","Symbol":["85Rb","87Rb"],"Relative Atomic Mass":[84.9117897379,86.909180531],"Isotopic Composition":[0.7217,0.2783]},"Sr":{"Name":"Strontium","Symbol":["84Sr","86Sr","87Sr","88Sr"],"Relative Atomic Mass":[83.9134191,85.9092606,86.9088775,87.9056125],"Isotopic Composition":[0.0056,0.0986,0.07,0.8258]},"Y":{"Name":"Yttrium","Symbol":["89Y"],"Relative Atomic Mass":[88.9058403],"Isotopic Composition":[1.0]},"Zr":{"Name":"Zirconium","Symbol":["90Zr","91Zr","92Zr","94Zr","96Zr"],"Relative Atomic Mass":[89.9046977,90.9056396,91.9050347,93.9063108,95.9082714],"Isotopic Composition":[0.5145,0.1122,0.1715,0.1738,0.028]},"Nb":{"Name":"Niobium","Symbol":["93Nb"],"Relative Atomic Mass":[92.906373],"Isotopic Composition":[1.0]},"Mo":{"Name":"Molybdenum","Symbol":["92Mo","94Mo","95Mo","96Mo","97Mo","98Mo","100Mo"],"Relative Atomic Mass":[91.90680796,93.9050849,94.90583877,95.90467612,96.90601812,97.90540482,99.9074718],"Isotopic Composition":[0.1453,0.0915,0.1584,0.1667,0.096,0.2439,0.0982]},"Ru":{"Name":"Ruthenium","Symbol":["96Ru","98Ru","99Ru","100Ru","101Ru","102Ru","104Ru"],"Relative Atomic Mass":[95.90759025,97.9052868,98.9059341,99.9042143,100.9055769,101.9043441,103.9054275],"Isotopic Composition":[0.0554,0.0187,0.1276,0.126,0.1706,0.3155,0.1862]},"Rh":{"Name":"Rhodium","Symbol":["103Rh"],"Relative Atomic Mass":[102.905498],"Isotopic Composition":[1.0]},"Pd":{"Name":"Palladium","Symbol":["102Pd","104Pd","105Pd","106Pd","108Pd","110Pd"],"Relative Atomic Mass":[101.9056022,103.9040305,104.9050796,105.9034804,107.9038916,109.9051722],"Isotopic Composition":[0.0102,0.1114,0.2233,0.2733,0.2646,0.1172]},"Ag":{"Name":"Silver","Symbol":["107Ag","109Ag"],"Relative Atomic Mass":[106.9050916,108.9047553],"Isotopic Composition":[0.51839,0.48161]},"Cd":{"Name":"Cadmium","Symbol":["106Cd","108Cd","110Cd","111Cd","112Cd","113Cd","114Cd","116Cd"],"Relative Atomic Mass":[105.9064599,107.9041834,109.90300661,110.90418287,111.90276287,112.90440813,113.90336509,115.90476315],"Isotopic Composition":[0.0125,0.0089,0.1249,0.128,0.2413,0.1222,0.2873,0.0749]},"In":{"Name":"Indium","Symbol":["113In","115In"],"Relative Atomic Mass":[112.90406184,114.903878776],"Isotopic Composition":[0.0429,0.9571]},"Sn":{"Name":"Tin","Symbol":["112Sn","114Sn","115Sn","116Sn","117Sn","118Sn","119Sn","120Sn","122Sn","124Sn"],"Relative Atomic Mass":[111.90482387,113.9027827,114.903344699,115.9017428,116.90295398,117.90160657,118.90331117,119.90220163,121.9034438,123.9052766],"Isotopic Composition":[0.0097,0.0066,0.0034,0.1454,0.0768,0.2422,0.0859,0.3258,0.0463,0.0579]},"Sb":{"Name":"Antimony","Symbol":["121Sb","123Sb"],"Relative Atomic Mass":[120.903812,122.9042132],"Isotopic Composition":[0.5721,0.4279]},"Te":{"Name":"Tellurium","Symbol":["120Te","122Te","123Te","124Te","125Te","126Te","128Te","130Te"],"Relative Atomic Mass":[119.9040593,121.9030435,122.9042698,123.9028171,124.9044299,125.9033109,127.90446128,129.906222748],"Isotopic Composition":[0.0009,0.0255,0.0089,0.0474,0.0707,0.1884,0.3174,0.3408]},"I":{"Name":"Iodine","Symbol":["127I"],"Relative Atomic Mass":[126.9044719],"Isotopic Composition":[1.0]},"Xe":{"Name":"Xenon","Symbol":["124Xe","126Xe","128Xe","129Xe","130Xe","131Xe","132Xe","134Xe","136Xe"],"Relative Atomic Mass":[123.905892,125.9042983,127.903531,128.9047808611,129.903509349,130.90508406,131.9041550856,133.90539466,135.907214484],"Isotopic Composition":[0.000952,0.00089,0.019102,0.264006,0.04071,0.212324,0.269086,0.104357,0.088573]},"Cs":{"Name":"Cesium","Symbol":["133Cs"],"Relative Atomic Mass":[132.905451961],"Isotopic Composition":[1.0]},"Ba":{"Name":"Barium","Symbol":["130Ba","132Ba","134Ba","135Ba","136Ba","137Ba","138Ba"],"Relative Atomic Mass":[129.9063207,131.9050611,133.90450818,134.90568838,135.90457573,136.90582714,137.905247],"Isotopic Composition":[0.00106,0.00101,0.02417,0.06592,0.07854,0.11232,0.71698]},"La":{"Name":"Lanthanum","Symbol":["138La","139La"],"Relative Atomic Mass":[137.9071149,138.9063563],"Isotopic Composition":[0.0008881,0.9991119]},"Ce":{"Name":"Cerium","Symbol":["136Ce","138Ce","140Ce","142Ce"],"Relative Atomic Mass":[135.90712921,137.905991,139.9054431,141.9092504],"Isotopic Composition":[0.00185,0.00251,0.8845,0.11114]},"Pr":{"Name":"Praseodymium","Symbol":["141Pr"],"Relative Atomic Mass":[140.9076576],"Isotopic Composition":[1.0]},"Nd":{"Name":"Neodymium","Symbol":["142Nd","143Nd","144Nd","145Nd","146Nd","148Nd","150Nd"],"Relative Atomic Mass":[141.907729,142.90982,143.910093,144.9125793,145.9131226,147.9168993,149.9209022],"Isotopic Composition":[0.27152,0.12174,0.23798,0.08293,0.17189,0.05756,0.05638]},"Sm":{"Name":"Samarium","Symbol":["144Sm","147Sm","148Sm","149Sm","150Sm","152Sm","154Sm"],"Relative Atomic Mass":[143.9120065,146.9149044,147.9148292,148.9171921,149.9172829,151.9197397,153.9222169],"Isotopic Composition":[0.0307,0.1499,0.1124,0.1382,0.0738,0.2675,0.2275]},"Eu":{"Name":"Europium","Symbol":["151Eu","153Eu"],"Relative Atomic Mass":[150.9198578,152.921238],"Isotopic Composition":[0.4781,0.5219]},"Gd":{"Name":"Gadolinium","Symbol":["152Gd","154Gd","155Gd","156Gd","157Gd","158Gd","160Gd"],"Relative Atomic Mass":[151.9197995,153.9208741,154.9226305,155.9221312,156.9239686,157.9241123,159.9270624],"Isotopic Composition":[0.002,0.0218,0.148,0.2047,0.1565,0.2484,0.2186]},"Tb":{"Name":"Terbium","Symbol":["159Tb"],"Relative Atomic Mass":[158.9253547],"Isotopic Composition":[1.0]},"Dy":{"Name":"Dysprosium","Symbol":["156Dy","158Dy","160Dy","161Dy","162Dy","163Dy","164Dy"],"Relative Atomic Mass":[155.9242847,157.9244159,159.9252046,160.9269405,161.9268056,162.9287383,163.9291819],"Isotopic Composition":[0.00056,0.00095,0.02329,0.18889,0.25475,0.24896,0.2826]},"Ho":{"Name":"Holmium","Symbol":["165Ho"],"Relative Atomic Mass":[164.9303288],"Isotopic Composition":[1.0]},"Er":{"Name":"Erbium","Symbol":["162Er","164Er","166Er","167Er","168Er","170Er"],"Relative Atomic Mass":[161.9287884,163.9292088,165.9302995,166.9320546,167.9323767,169.9354702],"Isotopic Composition":[0.00139,0.01601,0.33503,0.22869,0.26978,0.1491]},"Tm":{"Name":"Thulium","Symbol":["169Tm"],"Relative Atomic Mass":[168.9342179],"Isotopic Composition":[1.0]},"Yb":{"Name":"Ytterbium","Symbol":["168Yb","170Yb","171Yb","172Yb","173Yb","174Yb","176Yb"],"Relative Atomic Mass":[167.9338896,169.9347664,170.9363302,171.9363859,172.9382151,173.9388664,175.9425764],"Isotopic Composition":[0.00123,0.02982,0.1409,0.2168,0.16103,0.32026,0.12996]},"Lu":{"Name":"Lutetium","Symbol":["175Lu","176Lu"],"Relative Atomic Mass":[174.9407752,175.9426897],"Isotopic Composition":[0.97401,0.02599]},"Hf":{"Name":"Hafnium","Symbol":["174Hf","176Hf","177Hf","178Hf","179Hf","180Hf"],"Relative Atomic Mass":[173.9400461,175.9414076,176.9432277,177.9437058,178.9458232,179.946557],"Isotopic Composition":[0.0016,0.0526,0.186,0.2728,0.1362,0.3508]},"Ta":{"Name":"Tantalum","Symbol":["180Ta","181Ta"],"Relative Atomic Mass":[179.9474648,180.9479958],"Isotopic Composition":[0.0001201,0.9998799]},"W":{"Name":"Tungsten","Symbol":["180W","182W","183W","184W","186W"],"Relative Atomic Mass":[179.9467108,181.94820394,182.95022275,183.95093092,185.9543628],"Isotopic Composition":[0.0012,0.265,0.1431,0.3064,0.2843]},"Re":{"Name":"Rhenium","Symbol":["185Re","187Re"],"Relative Atomic Mass":[184.9529545,186.9557501],"Isotopic Composition":[0.374,0.626]},"Os":{"Name":"Osmium","Symbol":["184Os","186Os","187Os","188Os","189Os","190Os","192Os"],"Relative Atomic Mass":[183.9524885,185.953835,186.9557474,187.9558352,188.9581442,189.9584437,191.961477],"Isotopic Composition":[0.0002,0.0159,0.0196,0.1324,0.1615,0.2626,0.4078]},"Ir":{"Name":"Iridium","Symbol":["191Ir","193Ir"],"Relative Atomic Mass":[190.9605893,192.9629216],"Isotopic Composition":[0.373,0.627]},"Pt":{"Name":"Platinum","Symbol":["190Pt","192Pt","194Pt","195Pt","196Pt","198Pt"],"Relative Atomic Mass":[189.9599297,191.9610387,193.9626809,194.9647917,195.96495209,197.9678949],"Isotopic Composition":[0.00012,0.00782,0.3286,0.3378,0.2521,0.07356]},"Au":{"Name":"Gold","Symbol":["197Au"],"Relative Atomic Mass":[196.96656879],"Isotopic Composition":[1.0]},"Hg":{"Name":"Mercury","Symbol":["196Hg","198Hg","199Hg","200Hg","201Hg","202Hg","204Hg"],"Relative Atomic Mass":[195.9658326,197.9667686,198.96828064,199.96832659,200.97030284,201.9706434,203.97349398],"Isotopic Composition":[0.0015,0.0997,0.1687,0.231,0.1318,0.2986,0.0687]},"Tl":{"Name":"Thallium","Symbol":["203Tl","205Tl"],"Relative Atomic Mass":[202.9723446,204.9744278],"Isotopic Composition":[0.2952,0.7048]},"Pb":{"Name":"Lead","Symbol":["204Pb","206Pb","207Pb","208Pb"],"Relative Atomic Mass":[203.973044,205.9744657,206.9758973,207.9766525],"Isotopic Composition":[0.014,0.241,0.221,0.524]},"Bi":{"Name":"Bismuth","Symbol":["209Bi"],"Relative Atomic Mass":[208.9803991],"Isotopic Composition":[1.0]},"Th":{"Name":"Thorium","Symbol":["232Th"],"Relative Atomic Mass":[232.0380558],"Isotopic Composition":[1.0]},"Pa":{"Name":"Protactinium","Symbol":["231Pa"],"Relative Atomic Mass":[231.0358842],"Isotopic Composition":[1.0]},"U":{"Name":"Uranium","Symbol":["234U","235U","238U"],"Relative Atomic Mass":[234.0409523,235.0439301,238.0507884],"Isotopic Composition":[5.4e-5,0.007204,0.992742]},"D":{"Name":"Deuterium","Symbol":["2D"],"Relative Atomic Mass":[2.01410177812],"Isotopic Composition":[1.0]},"e":{"Name":"Electron","Symbol":"e","Relative Atomic Mass":[0.0005485],"Isotopic Composition":[1]}}
+{
+    "H": {
+        "Name": "Hydrogen",
+        "Symbol": [
+            "1H",
+            "2H"
+        ],
+        "Relative Atomic Mass": [
+            1.00782503223,
+            2.01410177812
+        ],
+        "Isotopic Composition": [
+            0.999885,
+            0.000115
+        ]
+    },
+    "He": {
+        "Name": "Helium",
+        "Symbol": [
+            "4He"
+        ],
+        "Relative Atomic Mass": [
+            4.00260325413
+        ],
+        "Isotopic Composition": [
+            0.99999866
+        ]
+    },
+    "Li": {
+        "Name": "Lithium",
+        "Symbol": [
+            "6Li",
+            "7Li"
+        ],
+        "Relative Atomic Mass": [
+            6.0151228874,
+            7.0160034366
+        ],
+        "Isotopic Composition": [
+            0.0759,
+            0.9241
+        ]
+    },
+    "Be": {
+        "Name": "Beryllium",
+        "Symbol": [
+            "9Be"
+        ],
+        "Relative Atomic Mass": [
+            9.012183065
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "B": {
+        "Name": "Boron",
+        "Symbol": [
+            "10B",
+            "11B"
+        ],
+        "Relative Atomic Mass": [
+            10.01293695,
+            11.00930536
+        ],
+        "Isotopic Composition": [
+            0.199,
+            0.801
+        ]
+    },
+    "C": {
+        "Name": "Carbon",
+        "Symbol": [
+            "12C",
+            "13C"
+        ],
+        "Relative Atomic Mass": [
+            12.0,
+            13.00335483507
+        ],
+        "Isotopic Composition": [
+            0.9893,
+            0.0107
+        ]
+    },
+    "N": {
+        "Name": "Nitrogen",
+        "Symbol": [
+            "14N",
+            "15N"
+        ],
+        "Relative Atomic Mass": [
+            14.00307400443,
+            15.00010889888
+        ],
+        "Isotopic Composition": [
+            0.99636,
+            0.00364
+        ]
+    },
+    "O": {
+        "Name": "Oxygen",
+        "Symbol": [
+            "16O",
+            "17O",
+            "18O"
+        ],
+        "Relative Atomic Mass": [
+            15.99491461957,
+            16.9991317565,
+            17.99915961286
+        ],
+        "Isotopic Composition": [
+            0.99757,
+            0.00038,
+            0.00205
+        ]
+    },
+    "F": {
+        "Name": "Fluorine",
+        "Symbol": [
+            "19F"
+        ],
+        "Relative Atomic Mass": [
+            18.99840316273
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Ne": {
+        "Name": "Neon",
+        "Symbol": [
+            "20Ne",
+            "21Ne",
+            "22Ne"
+        ],
+        "Relative Atomic Mass": [
+            19.9924401762,
+            20.993846685,
+            21.991385114
+        ],
+        "Isotopic Composition": [
+            0.9048,
+            0.0027,
+            0.0925
+        ]
+    },
+    "Na": {
+        "Name": "Sodium",
+        "Symbol": [
+            "23Na"
+        ],
+        "Relative Atomic Mass": [
+            22.989769282
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Mg": {
+        "Name": "Magnesium",
+        "Symbol": [
+            "24Mg",
+            "25Mg",
+            "26Mg"
+        ],
+        "Relative Atomic Mass": [
+            23.985041697,
+            24.985836976,
+            25.982592968
+        ],
+        "Isotopic Composition": [
+            0.7899,
+            0.1,
+            0.1101
+        ]
+    },
+    "Al": {
+        "Name": "Aluminum",
+        "Symbol": [
+            "27Al"
+        ],
+        "Relative Atomic Mass": [
+            26.98153853
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Si": {
+        "Name": "Silicon",
+        "Symbol": [
+            "28Si",
+            "29Si",
+            "30Si"
+        ],
+        "Relative Atomic Mass": [
+            27.97692653465,
+            28.9764946649,
+            29.973770136
+        ],
+        "Isotopic Composition": [
+            0.92223,
+            0.04685,
+            0.03092
+        ]
+    },
+    "P": {
+        "Name": "Phosphorus",
+        "Symbol": [
+            "31P"
+        ],
+        "Relative Atomic Mass": [
+            30.97376199842
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "S": {
+        "Name": "Sulfur",
+        "Symbol": [
+            "32S",
+            "33S",
+            "34S",
+            "36S"
+        ],
+        "Relative Atomic Mass": [
+            31.9720711744,
+            32.9714589098,
+            33.967867004,
+            35.96708071
+        ],
+        "Isotopic Composition": [
+            0.9499,
+            0.0075,
+            0.0425,
+            0.0001
+        ]
+    },
+    "Cl": {
+        "Name": "Chlorine",
+        "Symbol": [
+            "35Cl",
+            "37Cl"
+        ],
+        "Relative Atomic Mass": [
+            34.968852682,
+            36.965902602
+        ],
+        "Isotopic Composition": [
+            0.7576,
+            0.2424
+        ]
+    },
+    "Ar": {
+        "Name": "Argon",
+        "Symbol": [
+            "36Ar",
+            "38Ar",
+            "40Ar"
+        ],
+        "Relative Atomic Mass": [
+            35.967545105,
+            37.96273211,
+            39.9623831237
+        ],
+        "Isotopic Composition": [
+            0.003336,
+            0.000629,
+            0.996035
+        ]
+    },
+    "K": {
+        "Name": "Potassium",
+        "Symbol": [
+            "39K",
+            "40K",
+            "41K"
+        ],
+        "Relative Atomic Mass": [
+            38.9637064864,
+            39.963998166,
+            40.9618252579
+        ],
+        "Isotopic Composition": [
+            0.932581,
+            0.000117,
+            0.067302
+        ]
+    },
+    "Ca": {
+        "Name": "Calcium",
+        "Symbol": [
+            "40Ca",
+            "42Ca",
+            "43Ca",
+            "44Ca",
+            "46Ca",
+            "48Ca"
+        ],
+        "Relative Atomic Mass": [
+            39.962590863,
+            41.95861783,
+            42.95876644,
+            43.95548156,
+            45.953689,
+            47.95252276
+        ],
+        "Isotopic Composition": [
+            0.96941,
+            0.00647,
+            0.00135,
+            0.02086,
+            4.0e-5,
+            0.00187
+        ]
+    },
+    "Sc": {
+        "Name": "Scandium",
+        "Symbol": [
+            "45Sc"
+        ],
+        "Relative Atomic Mass": [
+            44.95590828
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Ti": {
+        "Name": "Titanium",
+        "Symbol": [
+            "46Ti",
+            "47Ti",
+            "48Ti",
+            "49Ti",
+            "50Ti"
+        ],
+        "Relative Atomic Mass": [
+            45.95262772,
+            46.95175879,
+            47.94794198,
+            48.94786568,
+            49.94478689
+        ],
+        "Isotopic Composition": [
+            0.0825,
+            0.0744,
+            0.7372,
+            0.0541,
+            0.0518
+        ]
+    },
+    "V": {
+        "Name": "Vanadium",
+        "Symbol": [
+            "50V",
+            "51V"
+        ],
+        "Relative Atomic Mass": [
+            49.94715601,
+            50.94395704
+        ],
+        "Isotopic Composition": [
+            0.0025,
+            0.9975
+        ]
+    },
+    "Cr": {
+        "Name": "Chromium",
+        "Symbol": [
+            "50Cr",
+            "52Cr",
+            "53Cr",
+            "54Cr"
+        ],
+        "Relative Atomic Mass": [
+            49.94604183,
+            51.94050623,
+            52.94064815,
+            53.93887916
+        ],
+        "Isotopic Composition": [
+            0.04345,
+            0.83789,
+            0.09501,
+            0.02365
+        ]
+    },
+    "Mn": {
+        "Name": "Manganese",
+        "Symbol": [
+            "55Mn"
+        ],
+        "Relative Atomic Mass": [
+            54.93804391
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Fe": {
+        "Name": "Iron",
+        "Symbol": [
+            "54Fe",
+            "56Fe",
+            "57Fe",
+            "58Fe"
+        ],
+        "Relative Atomic Mass": [
+            53.93960899,
+            55.93493633,
+            56.93539284,
+            57.93327443
+        ],
+        "Isotopic Composition": [
+            0.05845,
+            0.91754,
+            0.02119,
+            0.00282
+        ]
+    },
+    "Co": {
+        "Name": "Cobalt",
+        "Symbol": [
+            "59Co"
+        ],
+        "Relative Atomic Mass": [
+            58.93319429
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Ni": {
+        "Name": "Nickel",
+        "Symbol": [
+            "58Ni",
+            "60Ni",
+            "61Ni",
+            "62Ni",
+            "64Ni"
+        ],
+        "Relative Atomic Mass": [
+            57.93534241,
+            59.93078588,
+            60.93105557,
+            61.92834537,
+            63.92796682
+        ],
+        "Isotopic Composition": [
+            0.68077,
+            0.26223,
+            0.011399,
+            0.036346,
+            0.009255
+        ]
+    },
+    "Cu": {
+        "Name": "Copper",
+        "Symbol": [
+            "63Cu",
+            "65Cu"
+        ],
+        "Relative Atomic Mass": [
+            62.92959772,
+            64.9277897
+        ],
+        "Isotopic Composition": [
+            0.6915,
+            0.3085
+        ]
+    },
+    "Zn": {
+        "Name": "Zinc",
+        "Symbol": [
+            "64Zn",
+            "66Zn",
+            "67Zn",
+            "68Zn",
+            "70Zn"
+        ],
+        "Relative Atomic Mass": [
+            63.92914201,
+            65.92603381,
+            66.92712775,
+            67.92484455,
+            69.9253192
+        ],
+        "Isotopic Composition": [
+            0.4917,
+            0.2773,
+            0.0404,
+            0.1845,
+            0.0061
+        ]
+    },
+    "Ga": {
+        "Name": "Gallium",
+        "Symbol": [
+            "69Ga",
+            "71Ga"
+        ],
+        "Relative Atomic Mass": [
+            68.9255735,
+            70.92470258
+        ],
+        "Isotopic Composition": [
+            0.60108,
+            0.39892
+        ]
+    },
+    "Ge": {
+        "Name": "Germanium",
+        "Symbol": [
+            "70Ge",
+            "72Ge",
+            "73Ge",
+            "74Ge",
+            "76Ge"
+        ],
+        "Relative Atomic Mass": [
+            69.92424875,
+            71.922075826,
+            72.923458956,
+            73.921177761,
+            75.921402726
+        ],
+        "Isotopic Composition": [
+            0.2057,
+            0.2745,
+            0.0775,
+            0.365,
+            0.0773
+        ]
+    },
+    "As": {
+        "Name": "Arsenic",
+        "Symbol": [
+            "75As"
+        ],
+        "Relative Atomic Mass": [
+            74.92159457
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Se": {
+        "Name": "Selenium",
+        "Symbol": [
+            "74Se",
+            "76Se",
+            "77Se",
+            "78Se",
+            "80Se",
+            "82Se"
+        ],
+        "Relative Atomic Mass": [
+            73.922475934,
+            75.919213704,
+            76.919914154,
+            77.91730928,
+            79.9165218,
+            81.9166995
+        ],
+        "Isotopic Composition": [
+            0.0089,
+            0.0937,
+            0.0763,
+            0.2377,
+            0.4961,
+            0.0873
+        ]
+    },
+    "Br": {
+        "Name": "Bromine",
+        "Symbol": [
+            "79Br",
+            "81Br"
+        ],
+        "Relative Atomic Mass": [
+            78.9183376,
+            80.9162897
+        ],
+        "Isotopic Composition": [
+            0.5069,
+            0.4931
+        ]
+    },
+    "Kr": {
+        "Name": "Krypton",
+        "Symbol": [
+            "78Kr",
+            "80Kr",
+            "82Kr",
+            "83Kr",
+            "84Kr",
+            "86Kr"
+        ],
+        "Relative Atomic Mass": [
+            77.92036494,
+            79.91637808,
+            81.91348273,
+            82.91412716,
+            83.9114977282,
+            85.9106106269
+        ],
+        "Isotopic Composition": [
+            0.00355,
+            0.02286,
+            0.11593,
+            0.115,
+            0.56987,
+            0.17279
+        ]
+    },
+    "Rb": {
+        "Name": "Rubidium",
+        "Symbol": [
+            "85Rb",
+            "87Rb"
+        ],
+        "Relative Atomic Mass": [
+            84.9117897379,
+            86.909180531
+        ],
+        "Isotopic Composition": [
+            0.7217,
+            0.2783
+        ]
+    },
+    "Sr": {
+        "Name": "Strontium",
+        "Symbol": [
+            "84Sr",
+            "86Sr",
+            "87Sr",
+            "88Sr"
+        ],
+        "Relative Atomic Mass": [
+            83.9134191,
+            85.9092606,
+            86.9088775,
+            87.9056125
+        ],
+        "Isotopic Composition": [
+            0.0056,
+            0.0986,
+            0.07,
+            0.8258
+        ]
+    },
+    "Y": {
+        "Name": "Yttrium",
+        "Symbol": [
+            "89Y"
+        ],
+        "Relative Atomic Mass": [
+            88.9058403
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Zr": {
+        "Name": "Zirconium",
+        "Symbol": [
+            "90Zr",
+            "91Zr",
+            "92Zr",
+            "94Zr",
+            "96Zr"
+        ],
+        "Relative Atomic Mass": [
+            89.9046977,
+            90.9056396,
+            91.9050347,
+            93.9063108,
+            95.9082714
+        ],
+        "Isotopic Composition": [
+            0.5145,
+            0.1122,
+            0.1715,
+            0.1738,
+            0.028
+        ]
+    },
+    "Nb": {
+        "Name": "Niobium",
+        "Symbol": [
+            "93Nb"
+        ],
+        "Relative Atomic Mass": [
+            92.906373
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Mo": {
+        "Name": "Molybdenum",
+        "Symbol": [
+            "92Mo",
+            "94Mo",
+            "95Mo",
+            "96Mo",
+            "97Mo",
+            "98Mo",
+            "100Mo"
+        ],
+        "Relative Atomic Mass": [
+            91.90680796,
+            93.9050849,
+            94.90583877,
+            95.90467612,
+            96.90601812,
+            97.90540482,
+            99.9074718
+        ],
+        "Isotopic Composition": [
+            0.1453,
+            0.0915,
+            0.1584,
+            0.1667,
+            0.096,
+            0.2439,
+            0.0982
+        ]
+    },
+    "Ru": {
+        "Name": "Ruthenium",
+        "Symbol": [
+            "96Ru",
+            "98Ru",
+            "99Ru",
+            "100Ru",
+            "101Ru",
+            "102Ru",
+            "104Ru"
+        ],
+        "Relative Atomic Mass": [
+            95.90759025,
+            97.9052868,
+            98.9059341,
+            99.9042143,
+            100.9055769,
+            101.9043441,
+            103.9054275
+        ],
+        "Isotopic Composition": [
+            0.0554,
+            0.0187,
+            0.1276,
+            0.126,
+            0.1706,
+            0.3155,
+            0.1862
+        ]
+    },
+    "Rh": {
+        "Name": "Rhodium",
+        "Symbol": [
+            "103Rh"
+        ],
+        "Relative Atomic Mass": [
+            102.905498
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Pd": {
+        "Name": "Palladium",
+        "Symbol": [
+            "102Pd",
+            "104Pd",
+            "105Pd",
+            "106Pd",
+            "108Pd",
+            "110Pd"
+        ],
+        "Relative Atomic Mass": [
+            101.9056022,
+            103.9040305,
+            104.9050796,
+            105.9034804,
+            107.9038916,
+            109.9051722
+        ],
+        "Isotopic Composition": [
+            0.0102,
+            0.1114,
+            0.2233,
+            0.2733,
+            0.2646,
+            0.1172
+        ]
+    },
+    "Ag": {
+        "Name": "Silver",
+        "Symbol": [
+            "107Ag",
+            "109Ag"
+        ],
+        "Relative Atomic Mass": [
+            106.9050916,
+            108.9047553
+        ],
+        "Isotopic Composition": [
+            0.51839,
+            0.48161
+        ]
+    },
+    "Cd": {
+        "Name": "Cadmium",
+        "Symbol": [
+            "106Cd",
+            "108Cd",
+            "110Cd",
+            "111Cd",
+            "112Cd",
+            "113Cd",
+            "114Cd",
+            "116Cd"
+        ],
+        "Relative Atomic Mass": [
+            105.9064599,
+            107.9041834,
+            109.90300661,
+            110.90418287,
+            111.90276287,
+            112.90440813,
+            113.90336509,
+            115.90476315
+        ],
+        "Isotopic Composition": [
+            0.0125,
+            0.0089,
+            0.1249,
+            0.128,
+            0.2413,
+            0.1222,
+            0.2873,
+            0.0749
+        ]
+    },
+    "In": {
+        "Name": "Indium",
+        "Symbol": [
+            "113In",
+            "115In"
+        ],
+        "Relative Atomic Mass": [
+            112.90406184,
+            114.903878776
+        ],
+        "Isotopic Composition": [
+            0.0429,
+            0.9571
+        ]
+    },
+    "Sn": {
+        "Name": "Tin",
+        "Symbol": [
+            "112Sn",
+            "114Sn",
+            "115Sn",
+            "116Sn",
+            "117Sn",
+            "118Sn",
+            "119Sn",
+            "120Sn",
+            "122Sn",
+            "124Sn"
+        ],
+        "Relative Atomic Mass": [
+            111.90482387,
+            113.9027827,
+            114.903344699,
+            115.9017428,
+            116.90295398,
+            117.90160657,
+            118.90331117,
+            119.90220163,
+            121.9034438,
+            123.9052766
+        ],
+        "Isotopic Composition": [
+            0.0097,
+            0.0066,
+            0.0034,
+            0.1454,
+            0.0768,
+            0.2422,
+            0.0859,
+            0.3258,
+            0.0463,
+            0.0579
+        ]
+    },
+    "Sb": {
+        "Name": "Antimony",
+        "Symbol": [
+            "121Sb",
+            "123Sb"
+        ],
+        "Relative Atomic Mass": [
+            120.903812,
+            122.9042132
+        ],
+        "Isotopic Composition": [
+            0.5721,
+            0.4279
+        ]
+    },
+    "Te": {
+        "Name": "Tellurium",
+        "Symbol": [
+            "120Te",
+            "122Te",
+            "123Te",
+            "124Te",
+            "125Te",
+            "126Te",
+            "128Te",
+            "130Te"
+        ],
+        "Relative Atomic Mass": [
+            119.9040593,
+            121.9030435,
+            122.9042698,
+            123.9028171,
+            124.9044299,
+            125.9033109,
+            127.90446128,
+            129.906222748
+        ],
+        "Isotopic Composition": [
+            0.0009,
+            0.0255,
+            0.0089,
+            0.0474,
+            0.0707,
+            0.1884,
+            0.3174,
+            0.3408
+        ]
+    },
+    "I": {
+        "Name": "Iodine",
+        "Symbol": [
+            "127I"
+        ],
+        "Relative Atomic Mass": [
+            126.9044719
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Xe": {
+        "Name": "Xenon",
+        "Symbol": [
+            "124Xe",
+            "126Xe",
+            "128Xe",
+            "129Xe",
+            "130Xe",
+            "131Xe",
+            "132Xe",
+            "134Xe",
+            "136Xe"
+        ],
+        "Relative Atomic Mass": [
+            123.905892,
+            125.9042983,
+            127.903531,
+            128.9047808611,
+            129.903509349,
+            130.90508406,
+            131.9041550856,
+            133.90539466,
+            135.907214484
+        ],
+        "Isotopic Composition": [
+            0.000952,
+            0.00089,
+            0.019102,
+            0.264006,
+            0.04071,
+            0.212324,
+            0.269086,
+            0.104357,
+            0.088573
+        ]
+    },
+    "Cs": {
+        "Name": "Cesium",
+        "Symbol": [
+            "133Cs"
+        ],
+        "Relative Atomic Mass": [
+            132.905451961
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Ba": {
+        "Name": "Barium",
+        "Symbol": [
+            "130Ba",
+            "132Ba",
+            "134Ba",
+            "135Ba",
+            "136Ba",
+            "137Ba",
+            "138Ba"
+        ],
+        "Relative Atomic Mass": [
+            129.9063207,
+            131.9050611,
+            133.90450818,
+            134.90568838,
+            135.90457573,
+            136.90582714,
+            137.905247
+        ],
+        "Isotopic Composition": [
+            0.00106,
+            0.00101,
+            0.02417,
+            0.06592,
+            0.07854,
+            0.11232,
+            0.71698
+        ]
+    },
+    "La": {
+        "Name": "Lanthanum",
+        "Symbol": [
+            "138La",
+            "139La"
+        ],
+        "Relative Atomic Mass": [
+            137.9071149,
+            138.9063563
+        ],
+        "Isotopic Composition": [
+            0.0008881,
+            0.9991119
+        ]
+    },
+    "Ce": {
+        "Name": "Cerium",
+        "Symbol": [
+            "136Ce",
+            "138Ce",
+            "140Ce",
+            "142Ce"
+        ],
+        "Relative Atomic Mass": [
+            135.90712921,
+            137.905991,
+            139.9054431,
+            141.9092504
+        ],
+        "Isotopic Composition": [
+            0.00185,
+            0.00251,
+            0.8845,
+            0.11114
+        ]
+    },
+    "Pr": {
+        "Name": "Praseodymium",
+        "Symbol": [
+            "141Pr"
+        ],
+        "Relative Atomic Mass": [
+            140.9076576
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Nd": {
+        "Name": "Neodymium",
+        "Symbol": [
+            "142Nd",
+            "143Nd",
+            "144Nd",
+            "145Nd",
+            "146Nd",
+            "148Nd",
+            "150Nd"
+        ],
+        "Relative Atomic Mass": [
+            141.907729,
+            142.90982,
+            143.910093,
+            144.9125793,
+            145.9131226,
+            147.9168993,
+            149.9209022
+        ],
+        "Isotopic Composition": [
+            0.27152,
+            0.12174,
+            0.23798,
+            0.08293,
+            0.17189,
+            0.05756,
+            0.05638
+        ]
+    },
+    "Sm": {
+        "Name": "Samarium",
+        "Symbol": [
+            "144Sm",
+            "147Sm",
+            "148Sm",
+            "149Sm",
+            "150Sm",
+            "152Sm",
+            "154Sm"
+        ],
+        "Relative Atomic Mass": [
+            143.9120065,
+            146.9149044,
+            147.9148292,
+            148.9171921,
+            149.9172829,
+            151.9197397,
+            153.9222169
+        ],
+        "Isotopic Composition": [
+            0.0307,
+            0.1499,
+            0.1124,
+            0.1382,
+            0.0738,
+            0.2675,
+            0.2275
+        ]
+    },
+    "Eu": {
+        "Name": "Europium",
+        "Symbol": [
+            "151Eu",
+            "153Eu"
+        ],
+        "Relative Atomic Mass": [
+            150.9198578,
+            152.921238
+        ],
+        "Isotopic Composition": [
+            0.4781,
+            0.5219
+        ]
+    },
+    "Gd": {
+        "Name": "Gadolinium",
+        "Symbol": [
+            "152Gd",
+            "154Gd",
+            "155Gd",
+            "156Gd",
+            "157Gd",
+            "158Gd",
+            "160Gd"
+        ],
+        "Relative Atomic Mass": [
+            151.9197995,
+            153.9208741,
+            154.9226305,
+            155.9221312,
+            156.9239686,
+            157.9241123,
+            159.9270624
+        ],
+        "Isotopic Composition": [
+            0.002,
+            0.0218,
+            0.148,
+            0.2047,
+            0.1565,
+            0.2484,
+            0.2186
+        ]
+    },
+    "Tb": {
+        "Name": "Terbium",
+        "Symbol": [
+            "159Tb"
+        ],
+        "Relative Atomic Mass": [
+            158.9253547
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Dy": {
+        "Name": "Dysprosium",
+        "Symbol": [
+            "156Dy",
+            "158Dy",
+            "160Dy",
+            "161Dy",
+            "162Dy",
+            "163Dy",
+            "164Dy"
+        ],
+        "Relative Atomic Mass": [
+            155.9242847,
+            157.9244159,
+            159.9252046,
+            160.9269405,
+            161.9268056,
+            162.9287383,
+            163.9291819
+        ],
+        "Isotopic Composition": [
+            0.00056,
+            0.00095,
+            0.02329,
+            0.18889,
+            0.25475,
+            0.24896,
+            0.2826
+        ]
+    },
+    "Ho": {
+        "Name": "Holmium",
+        "Symbol": [
+            "165Ho"
+        ],
+        "Relative Atomic Mass": [
+            164.9303288
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Er": {
+        "Name": "Erbium",
+        "Symbol": [
+            "162Er",
+            "164Er",
+            "166Er",
+            "167Er",
+            "168Er",
+            "170Er"
+        ],
+        "Relative Atomic Mass": [
+            161.9287884,
+            163.9292088,
+            165.9302995,
+            166.9320546,
+            167.9323767,
+            169.9354702
+        ],
+        "Isotopic Composition": [
+            0.00139,
+            0.01601,
+            0.33503,
+            0.22869,
+            0.26978,
+            0.1491
+        ]
+    },
+    "Tm": {
+        "Name": "Thulium",
+        "Symbol": [
+            "169Tm"
+        ],
+        "Relative Atomic Mass": [
+            168.9342179
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Yb": {
+        "Name": "Ytterbium",
+        "Symbol": [
+            "168Yb",
+            "170Yb",
+            "171Yb",
+            "172Yb",
+            "173Yb",
+            "174Yb",
+            "176Yb"
+        ],
+        "Relative Atomic Mass": [
+            167.9338896,
+            169.9347664,
+            170.9363302,
+            171.9363859,
+            172.9382151,
+            173.9388664,
+            175.9425764
+        ],
+        "Isotopic Composition": [
+            0.00123,
+            0.02982,
+            0.1409,
+            0.2168,
+            0.16103,
+            0.32026,
+            0.12996
+        ]
+    },
+    "Lu": {
+        "Name": "Lutetium",
+        "Symbol": [
+            "175Lu",
+            "176Lu"
+        ],
+        "Relative Atomic Mass": [
+            174.9407752,
+            175.9426897
+        ],
+        "Isotopic Composition": [
+            0.97401,
+            0.02599
+        ]
+    },
+    "Hf": {
+        "Name": "Hafnium",
+        "Symbol": [
+            "174Hf",
+            "176Hf",
+            "177Hf",
+            "178Hf",
+            "179Hf",
+            "180Hf"
+        ],
+        "Relative Atomic Mass": [
+            173.9400461,
+            175.9414076,
+            176.9432277,
+            177.9437058,
+            178.9458232,
+            179.946557
+        ],
+        "Isotopic Composition": [
+            0.0016,
+            0.0526,
+            0.186,
+            0.2728,
+            0.1362,
+            0.3508
+        ]
+    },
+    "Ta": {
+        "Name": "Tantalum",
+        "Symbol": [
+            "180Ta",
+            "181Ta"
+        ],
+        "Relative Atomic Mass": [
+            179.9474648,
+            180.9479958
+        ],
+        "Isotopic Composition": [
+            0.0001201,
+            0.9998799
+        ]
+    },
+    "W": {
+        "Name": "Tungsten",
+        "Symbol": [
+            "180W",
+            "182W",
+            "183W",
+            "184W",
+            "186W"
+        ],
+        "Relative Atomic Mass": [
+            179.9467108,
+            181.94820394,
+            182.95022275,
+            183.95093092,
+            185.9543628
+        ],
+        "Isotopic Composition": [
+            0.0012,
+            0.265,
+            0.1431,
+            0.3064,
+            0.2843
+        ]
+    },
+    "Re": {
+        "Name": "Rhenium",
+        "Symbol": [
+            "185Re",
+            "187Re"
+        ],
+        "Relative Atomic Mass": [
+            184.9529545,
+            186.9557501
+        ],
+        "Isotopic Composition": [
+            0.374,
+            0.626
+        ]
+    },
+    "Os": {
+        "Name": "Osmium",
+        "Symbol": [
+            "184Os",
+            "186Os",
+            "187Os",
+            "188Os",
+            "189Os",
+            "190Os",
+            "192Os"
+        ],
+        "Relative Atomic Mass": [
+            183.9524885,
+            185.953835,
+            186.9557474,
+            187.9558352,
+            188.9581442,
+            189.9584437,
+            191.961477
+        ],
+        "Isotopic Composition": [
+            0.0002,
+            0.0159,
+            0.0196,
+            0.1324,
+            0.1615,
+            0.2626,
+            0.4078
+        ]
+    },
+    "Ir": {
+        "Name": "Iridium",
+        "Symbol": [
+            "191Ir",
+            "193Ir"
+        ],
+        "Relative Atomic Mass": [
+            190.9605893,
+            192.9629216
+        ],
+        "Isotopic Composition": [
+            0.373,
+            0.627
+        ]
+    },
+    "Pt": {
+        "Name": "Platinum",
+        "Symbol": [
+            "190Pt",
+            "192Pt",
+            "194Pt",
+            "195Pt",
+            "196Pt",
+            "198Pt"
+        ],
+        "Relative Atomic Mass": [
+            189.9599297,
+            191.9610387,
+            193.9626809,
+            194.9647917,
+            195.96495209,
+            197.9678949
+        ],
+        "Isotopic Composition": [
+            0.00012,
+            0.00782,
+            0.3286,
+            0.3378,
+            0.2521,
+            0.07356
+        ]
+    },
+    "Au": {
+        "Name": "Gold",
+        "Symbol": [
+            "197Au"
+        ],
+        "Relative Atomic Mass": [
+            196.96656879
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Hg": {
+        "Name": "Mercury",
+        "Symbol": [
+            "196Hg",
+            "198Hg",
+            "199Hg",
+            "200Hg",
+            "201Hg",
+            "202Hg",
+            "204Hg"
+        ],
+        "Relative Atomic Mass": [
+            195.9658326,
+            197.9667686,
+            198.96828064,
+            199.96832659,
+            200.97030284,
+            201.9706434,
+            203.97349398
+        ],
+        "Isotopic Composition": [
+            0.0015,
+            0.0997,
+            0.1687,
+            0.231,
+            0.1318,
+            0.2986,
+            0.0687
+        ]
+    },
+    "Tl": {
+        "Name": "Thallium",
+        "Symbol": [
+            "203Tl",
+            "205Tl"
+        ],
+        "Relative Atomic Mass": [
+            202.9723446,
+            204.9744278
+        ],
+        "Isotopic Composition": [
+            0.2952,
+            0.7048
+        ]
+    },
+    "Pb": {
+        "Name": "Lead",
+        "Symbol": [
+            "204Pb",
+            "206Pb",
+            "207Pb",
+            "208Pb"
+        ],
+        "Relative Atomic Mass": [
+            203.973044,
+            205.9744657,
+            206.9758973,
+            207.9766525
+        ],
+        "Isotopic Composition": [
+            0.014,
+            0.241,
+            0.221,
+            0.524
+        ]
+    },
+    "Bi": {
+        "Name": "Bismuth",
+        "Symbol": [
+            "209Bi"
+        ],
+        "Relative Atomic Mass": [
+            208.9803991
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Th": {
+        "Name": "Thorium",
+        "Symbol": [
+            "232Th"
+        ],
+        "Relative Atomic Mass": [
+            232.0380558
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "Pa": {
+        "Name": "Protactinium",
+        "Symbol": [
+            "231Pa"
+        ],
+        "Relative Atomic Mass": [
+            231.0358842
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "U": {
+        "Name": "Uranium",
+        "Symbol": [
+            "234U",
+            "235U",
+            "238U"
+        ],
+        "Relative Atomic Mass": [
+            234.0409523,
+            235.0439301,
+            238.0507884
+        ],
+        "Isotopic Composition": [
+            5.4e-5,
+            0.007204,
+            0.992742
+        ]
+    },
+    "D": {
+        "Name": "Deuterium",
+        "Symbol": [
+            "2D"
+        ],
+        "Relative Atomic Mass": [
+            2.01410177812
+        ],
+        "Isotopic Composition": [
+            1.0
+        ]
+    },
+    "e": {
+        "Name": "Electron",
+        "Symbol": "e",
+        "Relative Atomic Mass": [
+            0.0005485
+        ],
+        "Isotopic Composition": [
+            1
+        ]
+    }
+}

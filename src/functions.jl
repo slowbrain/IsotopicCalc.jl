@@ -1,4 +1,5 @@
-elementsAbundances = JSON.parsefile(Base.Filesystem.joinpath(dirname(@__FILE__),"elements.json"))
+using JSON
+const ELEMENTS = JSON.parsefile(Base.Filesystem.joinpath(dirname(@__FILE__),"elements.json"));
     
 function cart(x::Array,y::Array)
     #return [repmat(x,1,length(y))'[:] repmat(y,length(x),1)[:]]
@@ -68,7 +69,7 @@ function parseFormula(formula::AbstractString)
       end
     end
   end
-  return OrderedDict(elementsDict)
+  return elementsDict
 end
 
 function parseCharge(charge::AbstractString)
@@ -92,7 +93,8 @@ function parseCharge(charge::AbstractString)
   return (charge_multiple, charge_polarity)
 end
 
-function convoluteDict(sumForm::OrderedDict)
+
+function convoluteDict(sumForm::Dict)
   cD = Array{String,1}()
   for i in keys(sumForm)
     for j in 1:sumForm[i]
@@ -111,7 +113,7 @@ function elementsStringify!(stringBase::AbstractString, a::AbstractString, b::Nu
   stringBase
 end
 
-function sumFormula(sumFormDict::OrderedDict)
+function sumFormula(sumFormDict::Dict)
   sf = ""
   sf_c_prefix = ""
   sf_h_prefix = ""
@@ -178,13 +180,13 @@ function isotopicPattern(formula::String; kwargs...)
     end
 
     elem = string(composition[1])
-    masses = elementsAbundances[elem]["Relative Atomic Mass"]
-    abund = elementsAbundances[elem]["Isotopic Composition"]
+    masses = ELEMENTS[elem]["Relative Atomic Mass"]
+    abund = ELEMENTS[elem]["Isotopic Composition"]
 
     for i in 2:length(composition)
         elemNext = string(composition[i])
-        massesNext = elementsAbundances[elemNext]["Relative Atomic Mass"]
-        abundNext = elementsAbundances[elemNext]["Isotopic Composition"]
+        massesNext = ELEMENTS[elemNext]["Relative Atomic Mass"]
+        abundNext = ELEMENTS[elemNext]["Isotopic Composition"]
 
         massesTemp = round.(cartSum(masses, massesNext), digits = 6)
         abundTemp = cartProd(abund, abundNext)
@@ -219,7 +221,7 @@ function isotopicPattern(formula::String; kwargs...)
           charge_multiple = "1"
         end
         for i in 1:parse(Int,charge_multiple)
-          masses = [eval(Meta.parse(charge_polarity))(masses[j], -1*elementsAbundances["e"]["Relative Atomic Mass"][1]) for j in 1:length(masses)]
+          masses = [eval(Meta.parse(charge_polarity))(masses[j], -1*ELEMENTS["e"]["Relative Atomic Mass"][1]) for j in 1:length(masses)]
         end
         if parse(Int,charge_multiple) > 1
           masses = masses/parse(Int,charge_multiple)
@@ -280,10 +282,126 @@ function isotopicPattern(formula::String; kwargs...)
     return IPCresult[SFx]
 end;
 
-isopat(x) = isotopicPattern(x)
+isopat(x...) = isotopicPattern(x...)
 
-isotopicPatternProtonated(x) = isotopicPattern(x, adduct="H", charge="+")
-isopatprot(x) = isotopicPatternProtonated(x)
+# special cases
+isotopicPatternProtonated(x) = isotopicPattern(x; adduct="H", charge="+")
+isopatprot(x...) = isotopicPatternProtonated(x...)
 
-monoisotopicMass(x) = isotopicPattern(x;niceOutput=false)[1,1]
-monoisomass(x) = monoisotopicMass(x)
+monoisotopicMass(x) = isotopicPattern(x...; niceOutput=false)[1,1]
+monoisomass(x...) = monoisotopicMass(x...)
+
+monoisotopicMassProtonated(x) = isotopicPattern(x...; adduct="H", charge="+", niceOutput=false)[1,1]
+monoisomassprot(x...) = monoisotopicMassProtonated(x...)
+
+
+
+# Parse the molecular formula
+function parse_formula(formula::String)
+  atoms = Dict{String, Int}()
+  
+  # Expand bracketed groups
+  while true
+      match_data = match(r"\(([^)]+)\)(\d+)", formula)
+      if match_data === nothing
+          break
+      end
+      group_content = match_data.captures[1]
+      multiplier = parse(Int, match_data.captures[2])
+      replacement = repeat(group_content, multiplier)
+      formula = replace(formula, match_data.match => replacement)
+  end
+  
+  # Match element symbols followed by optional digit counts
+  matches = eachmatch(r"([A-Z][a-z]*)(\d*)", formula)
+  
+  for m in matches
+      element = m.captures[1]
+      count_str = m.captures[2]
+      count = isempty(count_str) ? 1 : parse(Int, count_str)
+      
+      # Add the count of the element to the dictionary, accumulating if the element already exists
+      atoms[element] = get(atoms, element, 0) + count
+  end
+  
+  return atoms
+end
+
+function convolve(distro1, distro2, abundance_cutoff)
+  new_distribution = Dict{Float64, Float64}()
+  for (m1, a1) in distro1
+      for (m2, a2) in distro2
+          mass = m1 + m2
+          abundance = a1 * a2
+          # Only include isotopes with abundances above the cutoff
+          if abundance >= abundance_cutoff
+              new_distribution[mass] = get(new_distribution, mass, 0.0) + abundance
+          end
+      end
+  end
+  return sort(collect(new_distribution))
+end
+
+function normalize_abundances(distribution)
+  # Find the maximum abundance
+  max_abundance = maximum([a for (m, a) in distribution])
+  
+  # Normalize all abundances
+  normalized_distribution = [(m, a / max_abundance) for (m, a) in distribution]
+  
+  return normalized_distribution
+end
+
+function group_by_resolution(distribution, R)
+  grouped = Dict{Float64, Float64}()
+  
+  for (m, a) in distribution
+      Δm = m / R
+      # Round the mass based on Δm and ensure a minimum of 3 decimal places
+      rounded_mass = round(m, digits=maximum(3, round(Int, -log10(Δm/10))))
+      
+      # Group by the rounded mass and sum the abundances
+      grouped[rounded_mass] = get(grouped, rounded_mass, 0.0) + a
+  end
+  
+  return sort(collect(grouped))
+end
+
+function isotopic_pattern(formula::String, abundance_cutoff=1e-5, R=5000)  # Default resolution R = 5000
+  parsed_formula = parse_formula(formula)
+  
+  # Initial distribution: monoisotopic mass with 100% abundance
+  final_distribution = [(0.0, 1.0)]
+  
+  for (atom, count) in parsed_formula
+      masses = ELEMENTS[atom]["Relative Atomic Mass"]
+      abundances = ELEMENTS[atom]["Isotopic Composition"]
+      atom_distribution = sort(collect(zip(masses, abundances)))
+      
+      for _ = 1:count
+          final_distribution = convolve(final_distribution, atom_distribution, abundance_cutoff)
+          # Filter out isotopes below the abundance cutoff
+          final_distribution = filter(x -> x[2] >= abundance_cutoff, final_distribution)
+      end
+  end
+  
+  # Group and sum abundances based on the provided mass resolution R
+  final_distribution = group_by_resolution(final_distribution, R)
+  
+  # Normalize the abundances to 100%
+  final_distribution = normalize_abundances(final_distribution)
+  
+  # Sort the distribution by mass
+  return sort(final_distribution)
+end
+
+# Example usage with user-defined cutoff and mass resolution
+formula = "CH3COCH3" # acetone
+user_cutoff = 1e-5
+mass_resolution = 5e3  # Example resolution
+distribution = isotopic_pattern(formula, user_cutoff, mass_resolution);
+println("Isotopic pattern for $formula with abundance cutoff of $user_cutoff and mass resolution R=$mass_resolution")
+for (m, a) in distribution
+  println("Mass: $m, Abundance: $(round(a * 100, digits=2))%")
+end
+
