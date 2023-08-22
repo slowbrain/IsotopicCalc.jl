@@ -1,6 +1,3 @@
-using JSON
-const ELEMENTS = JSON.parsefile(Base.Filesystem.joinpath(dirname(@__FILE__),"elements.json"));
-    
 function cart(x::Array,y::Array)
     #return [repmat(x,1,length(y))'[:] repmat(y,length(x),1)[:]]
     leny=length(y)
@@ -300,6 +297,14 @@ monoisomassprot(x...) = monoisotopicMassProtonated(x...)
 function parse_formula(formula::String)
   atoms = Dict{String, Int}()
   
+  # Handle specific isotopes in square brackets
+  isotopic_matches = eachmatch(r"\[([^\]]+)\]", formula)
+  for m in isotopic_matches
+      isotope = m.captures[1]
+      atoms[isotope] = get(atoms, isotope, 0) + 1
+  end
+  formula = replace(formula, r"\[([^\]]+)\]" => "")
+  
   # Expand bracketed groups
   while true
       match_data = match(r"\(([^)]+)\)(\d+)", formula)
@@ -394,14 +399,3 @@ function isotopic_pattern(formula::String, abundance_cutoff=1e-5, R=5000)  # Def
   # Sort the distribution by mass
   return sort(final_distribution)
 end
-
-# Example usage with user-defined cutoff and mass resolution
-formula = "CH3COCH3" # acetone
-user_cutoff = 1e-5
-mass_resolution = 5e3  # Example resolution
-distribution = isotopic_pattern(formula, user_cutoff, mass_resolution);
-println("Isotopic pattern for $formula with abundance cutoff of $user_cutoff and mass resolution R=$mass_resolution")
-for (m, a) in distribution
-  println("Mass: $m, Abundance: $(round(a * 100, digits=2))%")
-end
-
