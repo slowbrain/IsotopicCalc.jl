@@ -129,6 +129,9 @@ end
 
 """
 Usage: isotopicPattern(formula::AbstractString; adduct=\"H\", charge=\"+\", abundanceLimit = 1e-5, niceOutput = true)")
+
+args:   formula - can be sum formula
+kwargs: adduct - possible adduct to the  
 """
 function isotopicPattern(formula::String; kwargs...)
     kwargs = Dict(kwargs)

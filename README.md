@@ -15,6 +15,8 @@ using Pkg; Pkg.add("IsotopicCalc.jl")
 ```
 
 ### Usage
+Below are examples of 
+
 ```julia
 using IsotopicCalc
 
