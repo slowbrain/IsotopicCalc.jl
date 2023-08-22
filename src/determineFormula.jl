@@ -24,7 +24,7 @@ function generate_compounds(atom_pool::Dict{String, Int}, adduct::String, charge
             
             # Apply heuristic rules
             if N <= 0.5C
-                M = sum(current[i] * ATOMIC_MASSES[elements[i]] for i in 1:length(elements)) + adduct_mass - charge*0.0005485
+                M = sum(current[i] * ATOMIC_MASSES[elements[i]] for i in eachindex(elements)) + adduct_mass - charge*0.0005485
                 mz_calculated = charge == 0 ? M : M / abs(charge)
                 formula = join([string(elements[i], current[i] == 1 ? "" : current[i]) for i in 1:length(elements) if current[i] > 0])
                 ppm = ((mz_input - mz_calculated) / mz_calculated) * 1e6
