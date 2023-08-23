@@ -1,6 +1,6 @@
 module IsotopicCalc
 
-    using JSON
+    using JSON, Printf
 
     const ELEMENTS = JSON.parsefile(Base.Filesystem.joinpath(dirname(@__FILE__),"elements.json"));
 

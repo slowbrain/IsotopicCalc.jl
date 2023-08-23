@@ -87,6 +87,23 @@ function get_base_element(isotope::String)
   end
 end
 
+function sum_formula(parsed_formula::Dict{String, Int})
+  elements_order = ["C", "H", "O", "N", "P", "S", "F", "Cl", "Br", "I"]  # Common elements first
+  other_elements = setdiff(collect(keys(parsed_formula)), elements_order)  # Convert keys to an array
+  sort!(other_elements)
+
+  sum_formula = ""
+  for element in [elements_order; other_elements]
+      count = get(parsed_formula, element, 0)
+      if count > 0
+          sum_formula *= element
+          sum_formula *= count > 1 ? string(count) : ""
+      end
+  end
+  return sum_formula
+end
+
+
 function combine_formulas(base_formula::Dict{String, Int}, adduct_formula::Dict{String, Int})
   combined_formula = deepcopy(base_formula)
   for (atom, count) in adduct_formula
@@ -171,21 +188,26 @@ function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=4000, adduct:
   sort!(final_distribution)
 
   # Format the output
-  output = "\nFormula: \e[1;32m $formula"
+  output = "\nFormula: \e[1;32m $(sum_formula(parse_formula(formula)))"
   if !isempty(adduct)
       output *= ".$adduct"
   end
-  output *= "\n\e[m-------------------------------\n"
-  output *= "Mass [amu]\tAbundance [%]\n"
-  output *= "-------------------------------\n"
+  output *= "\n\e[m----------------------------\n"
+  # constant padding in title independent on tab length
+  pad_tileIO = IOBuffer(); @printf(pad_tileIO, "%5s", ""); pad_title = String(take!(pad_tileIO))
+  output *= "Mass [amu]"*pad_title*"Abundance [%]\n"
+  output *= "----------------------------\n"
   for (m, a) in final_distribution
-      if a >= 1
-        output *= "$m\t\t$(round(Int,a * 100)).000\n"
-      elseif a >= 0.1 && a < 1
-        output *= "$m\t\t $(round(a * 100, digits=3))\n"
-      elseif a < 0.1
-        output *= "$m\t\t  $(round(a * 100, digits=3))\n"
-      end
+      # mass formated to 4 decimal point even padded with zero if necessary
+      mIO = IOBuffer(); @printf(mIO, "%.4f", m); mm = String(take!(mIO))
+      # abbundance in % formated to 3 decimal point even padded with zero if necessary
+      aIO = IOBuffer(); @printf(aIO, "%.2f", a*100); aa = String(take!(aIO))
+      # padding list dependent on mass
+      format_pad = Printf.Format("%"*string(14-length(mm)+7)*"s")
+      padIO = IOBuffer(); Printf.format(padIO, format_pad, aa); pad = String(take!(padIO))
+      #padIO = IOBuffer(); @printf(padIO, "%14s", aa); pad = String(take!(padIO))
+
+      output *= mm * pad *"\n"
   end
   output *= "Found $(length(final_distribution)) isotopic masses for $abundance_cutoff abundance limit."
   
