@@ -324,7 +324,7 @@ function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=10000, adduct
         format_pad = Printf.Format("%"*string(15-length(mm)+length(aa))*"s")
         padIO = IOBuffer(); Printf.format(padIO, format_pad, aa); pad = String(take!(padIO))
         #padIO = IOBuffer(); @printf(padIO, "%14s", aa); pad = String(take!(padIO))
-git
+        
         output *= mm * pad *"\n"
     end
     output *= "Found $(length(final_distribution)) isotopic masses for $abundance_cutoff abundance limit."
