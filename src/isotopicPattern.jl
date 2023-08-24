@@ -131,7 +131,7 @@ function extract_charge(adduct::String)
   return 0  # No charge information found
 end
 
-function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=4000, adduct::String="")  # Default resolution R = 10000
+function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=4000, adduct::String="", print=true)  # Default resolution R = 10000
   parsed_formula = parse_formula(formula)
     
   # If an adduct is provided, parse and combine it with the base formula
@@ -187,31 +187,33 @@ function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=4000, adduct:
   # Sort the distribution by mass
   sort!(final_distribution)
 
-  # Format the output
-  output = "\nFormula: \e[1;32m $(sum_formula(parse_formula(formula)))"
-  if !isempty(adduct)
-      output *= ".$adduct"
-  end
-  output *= "\n\e[m----------------------------\n"
-  # constant padding in title independent on tab length
-  pad_tileIO = IOBuffer(); @printf(pad_tileIO, "%5s", ""); pad_title = String(take!(pad_tileIO))
-  output *= "Mass [amu]"*pad_title*"Abundance [%]\n"
-  output *= "----------------------------\n"
-  for (m, a) in final_distribution
-      # mass formated to 4 decimal point even padded with zero if necessary
-      mIO = IOBuffer(); @printf(mIO, "%.4f", m); mm = String(take!(mIO))
-      # abbundance in % formated to 3 decimal point even padded with zero if necessary
-      aIO = IOBuffer(); @printf(aIO, "%.2f", a*100); aa = String(take!(aIO))
-      # padding list dependent on mass
-      format_pad = Printf.Format("%"*string(14-length(mm)+7)*"s")
-      padIO = IOBuffer(); Printf.format(padIO, format_pad, aa); pad = String(take!(padIO))
-      #padIO = IOBuffer(); @printf(padIO, "%14s", aa); pad = String(take!(padIO))
+  if print
+    # Format the output
+    output = "\nFormula: \e[1;32m $(sum_formula(parse_formula(formula)))"
+    if !isempty(adduct)
+        output *= ".$adduct"
+    end
+    output *= "\n\e[m----------------------------\n"
+    # constant padding in title independent on tab length
+    pad_tileIO = IOBuffer(); @printf(pad_tileIO, "%5s", ""); pad_title = String(take!(pad_tileIO))
+    output *= "Mass [amu]"*pad_title*"Abundance [%]\n"
+    output *= "----------------------------\n"
+    for (m, a) in final_distribution
+        # mass formated to 4 decimal point even padded with zero if necessary
+        mIO = IOBuffer(); @printf(mIO, "%.4f", m); mm = String(take!(mIO))
+        # abbundance in % formated to 3 decimal point even padded with zero if necessary
+        aIO = IOBuffer(); @printf(aIO, "%.2f", a*100); aa = String(take!(aIO))
+        # padding list dependent on mass
+        format_pad = Printf.Format("%"*string(14-length(mm)+7)*"s")
+        padIO = IOBuffer(); Printf.format(padIO, format_pad, aa); pad = String(take!(padIO))
+        #padIO = IOBuffer(); @printf(padIO, "%14s", aa); pad = String(take!(padIO))
 
-      output *= mm * pad *"\n"
+        output *= mm * pad *"\n"
+    end
+    output *= "Found $(length(final_distribution)) isotopic masses for $abundance_cutoff abundance limit."
+
+    println(output)
   end
-  output *= "Found $(length(final_distribution)) isotopic masses for $abundance_cutoff abundance limit."
-  
-  println(output)
   return final_distribution
 end
 
@@ -219,10 +221,10 @@ isopat(x...) = isotopicPattern(x...)
 
 # special cases
 isotopicPatternProtonated(x) = isotopicPattern(x; adduct="H+")
-isopatprot(x...) = isotopicPatternProtonated(x...)
+isopatprot(x) = iisotopicPatternProtonated(x)
 
-monoisotopicMass(x) = isotopicPattern(x...)[1][1]
-monoisomass(x...) = monoisotopicMass(x...)
+monoisotopicMass(x) = isotopicPattern(x;print=false)[1][1]
+monoisomass(x) = monoisotopicMass(x)
 
-monoisotopicMassProtonated(x) = isotopicPattern(x...; adduct="H+")[1][1]
-monoisomassprot(x...) = monoisotopicMassProtonated(x...)
+monoisotopicMassProtonated(x) = isotopicPattern(x; adduct="H+", print=false)[1][1]
+monoisomassprot(x) = monoisotopicMassProtonated(x)
