@@ -61,13 +61,5 @@ function find_compounds(mz_input::Float64, tolerance::Float64, atom_pool::Dict{S
         adduct_string = adduct == "" ? charge_sign : "\t[" * adduct * "]" * charge_sign
         println(" ", compound.formula, adduct_string, "\tm/z: ", string(round(compound.mz, digits=6)), "\tppm: ", string(round(compound.ppm, digits=2)))
     end
+    return matching_compounds
 end
-
-# Test the script
-mz_input = 59.0491
-tolerance = 20.0  # Tolerance in ppm
-atom_pool = Dict("C" => 5, "H" => 10, "N" => 2, "O" => 3)
-adduct = "M+H"
-charge = 1
-
-find_compounds(mz_input, tolerance, atom_pool, adduct, charge)
