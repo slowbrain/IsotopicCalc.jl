@@ -23,7 +23,7 @@ function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, addu
             
             # Apply heuristic rules
             if 1>0
-                M = sum(current[i] * ATOMIC_MASSES[elements[i]] for i in eachindex(elements)) + adduct_mass - charge*0.0005485
+                M = sum(current[i] * ELEMENTS[elements[i]] for i in eachindex(elements)) + adduct_mass - charge*0.0005485
                 mz_calculated = charge == 0 ? M : M / abs(charge)
                 formula = join([string(elements[i], current[i] == 1 ? "" : current[i]) for i in 1:length(elements) if current[i] > 0])
                 ppm = ((mz_input - mz_calculated) / mz_calculated) * 1e6
@@ -48,7 +48,7 @@ function filter_formulas(formulas, mz_input, tolerance)
     return filter(c -> abs(c.ppm) <= tolerance, formulas)
 end
 
-function find_formula(mz_input::Float64; tolerance_ppm::Number=100, atom_pool::Dict{String, Int}=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10), adduct::String="", charge::Int=0)
+function findFormula(mz_input::Float64; tolerance_ppm::Number=100, atom_pool::Dict{String, Int}=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10), adduct::String="", charge::Int=0)
     formulas = generate_formulas(mz_input, atom_pool, adduct, charge)
     matching_formulas = filter_formulas(formulas, mz_input, tolerance_ppm)
     
