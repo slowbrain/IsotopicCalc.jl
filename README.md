@@ -18,12 +18,19 @@ Package uses isotopic abundances of elements from NIST online database (Atomic W
 
 #### Input formula
 Acceptable sum formula formats are shown below (case for acetone):
+```julia
 C3H6O
 CH3COCH3
 (CH3)2CO
-([12C]H2)3O
 OH3(CH)3
+```
 
+There is also an option to specify concrete isotope using square bracket notation. 
+```julia
+[13C]H3COCH3    # acetone with one ¹³C isotope
+C3[2H]6O        # fully deuterated acetone
+C3D6O           # another notation for fully deuterated acetone
+```
 #### Examples
 Main pupose of this package is to give isotopic pattern distribution for any chemical formula in following fashion:
 ```julia
