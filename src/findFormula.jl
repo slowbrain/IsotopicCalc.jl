@@ -22,8 +22,8 @@ function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, addu
             O = current[findfirst(isequal("O"), elements)]
             
             # Apply heuristic rules
-            if 1>0
-                M = sum(current[i] * ELEMENTS[elements[i]] for i in eachindex(elements)) + adduct_mass - charge*0.0005485
+            if H >= 0.5C && O <= C
+                M = sum(current[i] * ELEMENTS[elements[i]]["Relative Atomic Mass"][1] for i in eachindex(elements)) + adduct_mass - charge*0.0005485
                 mz_calculated = charge == 0 ? M : M / abs(charge)
                 formula = join([string(elements[i], current[i] == 1 ? "" : current[i]) for i in 1:length(elements) if current[i] > 0])
                 ppm = ((mz_input - mz_calculated) / mz_calculated) * 1e6
@@ -38,7 +38,10 @@ function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, addu
     end
     
     elements = collect(keys(atom_pool))
-    max_counts = collect(values(atom_pool))
+    max_counts = []
+    for elem in elements
+        push!(max_counts,minimum([atom_pool[elem],round(Int, mz_input/ELEMENTS[elem]["Relative Atomic Mass"][1])]))
+    end
     generate_combinations(elements, max_counts, 1, zeros(Int, length(elements)))
     
     return formulas
