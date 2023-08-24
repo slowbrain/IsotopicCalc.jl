@@ -1,10 +1,12 @@
 module IsotopicCalc
 
-    using JSON, OrderedCollections
+    using JSON, Printf
 
-    include("functions.jl")
+    const ELEMENTS = JSON.parsefile(Base.Filesystem.joinpath(dirname(@__FILE__),"elements.json"));
 
-    export isotopicPattern, isotopicPatternProtonated, monoisotopicMass
-    export isopat, isopatprot, monoisomass
+    include("isotopicPattern.jl")
+    include("findFormula.jl")
+
+    export isotopicPattern, monoisotopicMass, isotopicPatternProtonated, monoisotopicMassProtonated
 
 end # module
