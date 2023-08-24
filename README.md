@@ -65,7 +65,12 @@ Actual output of the function is a `Vector{Tuple{Float64,Float64}}` that contain
 
 The function has several keyword arguments used to customize the output. By default it has cut-off abundance set for 1e-5 as is always shown on function printout. The other keyword arguments include resolution (default value 10000) and possible adduct to the molecule (default set to "").
 ```julia
-isotopicPattern(formula::String; abundance_cutoff=1e-5, R=4000, adduct::String="", print=true)
+isotopicPattern(formula::String; 
+                abundance_cutoff=1e-5, 
+                R=4000, 
+                adduct::String="", 
+                print=true
+               )
 ```
 It's rather self explaining in following examples:
 ```julia
@@ -135,8 +140,45 @@ julia> monoisotopicMass("CH3COCH3")
 58.0419
 ```
 
+### Finding formulas
+Rudimentary determination of compound sum formula from monoisotopic mass is implemented too.
+```julia
+julia> find_formula(58.0419);
+Matching formulas:
+ C3H6O  m/z: 58.041865  ppm: 0.61
+ ```
+
+The function has several keyword arguments used to customize the output. 
+```julia
+find_formula(mz_input::Float64; 
+             atom_pool::Dict{String, Int}=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10),
+             tolerance_ppm::Number=100, 
+             adduct::String="", 
+             charge::Int=0
+            )
+```
+By default algoritm searches withing a interval of 100 ppm around monoisotopic mass and takes into consideration C, H, O, N to be possible buiding atoms. The associated numbers mean maximum amount of respective atoms to be considered.
+So far adducts can be one of following `M+H`, `M+Na`, `M+K`, `M-H` and charge is to be expresed separately as in example.
+
+```julia
+julia> find_formula(46.000; tolerance_ppm=2000, charge=1);
+Matching formulas:
+ CH2O2+ m/z: 46.004931  ppm: -107.18
+ NO2+   m/z: 45.992355  ppm: 166.23
+ N2H2O+ m/z: 46.016164  ppm: -351.27
+ CNH4O+ m/z: 46.02874   ppm: -624.4
+ N3H4+  m/z: 46.039974  ppm: -868.24
+ C2H6O+ m/z: 46.041316  ppm: -897.37
+ CN2H6+ m/z: 46.05255   ppm: -1141.08
+ C2NH8+ m/z: 46.065126  ppm: -1413.78
+ C3H10+ m/z: 46.077702  ppm: -1686.32
 
 
+julia> find_formula(59.0491; adduct="M+H", charge=1);
+Matching formulas:
+ C3H6O  [M+H]+  m/z: 59.049141  ppm: -0.7
+ CN3H4  [M+H]+  m/z: 59.047799  ppm: 22.04
+```
 
 
 ### Citing

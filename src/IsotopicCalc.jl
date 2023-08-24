@@ -5,7 +5,7 @@ module IsotopicCalc
     const ELEMENTS = JSON.parsefile(Base.Filesystem.joinpath(dirname(@__FILE__),"elements.json"));
 
     include("isotopicPattern.jl")
-    include("determineFormula.jl")
+    include("findFormula.jl")
 
     export isotopicPattern, monoisotopicMass, isotopicPatternProtonated, monoisotopicMassProtonated
 
