@@ -1,74 +1,141 @@
 # Parse the molecular formula
-function parse_formula(formula::String)
-  parsed_formula = Dict{String, Int}()
-  i = 1
-  n = length(formula)
-  local_multiplier = 1
+function expand_round_brackets(formula::String)
+    expanded_formula = ""
+    i = 1
+    n = length(formula)
 
-  while i <= n
-      c = formula[i]
-      if isletter(c)
-          k = i + 1
-          while k <= n && (isletter(formula[k]) || isdigit(formula[k]))
-              k += 1
-          end
-          atom = formula[i:k-1]
-          count = 1  # Default count is 1
-          if k <= n && isdigit(formula[k])
-              l = k
-              while l <= n && isdigit(formula[l])
-                  l += 1
-              end
-              count = parse(Int, formula[k:l-1])
-              k = l
-          end
-          parsed_formula[atom] = get(parsed_formula, atom, 0) + (count * local_multiplier)
-          i = k
-      elseif c == '(' || c == '['
-          closing = (c == '(' ? ')' : ']')
-          counter = 1
-          k = i + 1
-          while k <= n
-              if formula[k] == c
-                  counter += 1
-              elseif formula[k] == closing
-                  counter -= 1
-              end
-              if counter == 0
-                  break
-              end
-              k += 1
-          end
-          if counter != 0
-              throw(ArgumentError("Unmatched $c in formula"))
-          end
-          sub_formula = formula[i+1:k-1]
-          k += 1  # Move past the closing bracket
-          multiplier = 1  # Default multiplier is 1
-          if k <= n && isdigit(formula[k])
-              l = k
-              while l <= n && isdigit(formula[l])
-                  l += 1
-              end
-              multiplier = parse(Int, formula[k:l-1])
-              k = l
-          end
-          sub_parsed = parse_formula(sub_formula)
-          for (atom, count) in sub_parsed
-              parsed_formula[atom] = get(parsed_formula, atom, 0) + (count * multiplier * local_multiplier)
-          end
-          i = k
-      elseif isdigit(c)
-          i += 1
-      else
-          throw(ArgumentError("Invalid character $c in formula"))
-      end
-  end
-  return parsed_formula
+    while i <= n
+        c = formula[i]
+
+        if c == '('
+            j = i
+            open_brackets = 1
+            while j < n
+                j += 1
+                if formula[j] == '('
+                    open_brackets += 1
+                elseif formula[j] == ')'
+                    open_brackets -= 1
+                end
+                if open_brackets == 0
+                    break
+                end
+            end
+
+            if open_brackets != 0
+                throw(ArgumentError("Unmatched brackets in formula"))
+            end
+
+            subformula = formula[i+1:j-1]
+            i = j + 1
+            multiplier = ""
+
+            while i <= n && isdigit(formula[i])
+                multiplier *= formula[i]
+                i += 1
+            end
+
+            multiplier = isempty(multiplier) ? 1 : parse(Int, multiplier)
+            expanded_subformula = expand_round_brackets(subformula)  # recursively expand
+            expanded_formula *= repeat(expanded_subformula, multiplier)
+        else
+            expanded_formula *= c
+            i += 1
+        end
+    end
+    return expanded_formula
 end
 
-parsed_formula = parse_formula("([13C]H3)2CO")
-println(parsed_formula)
+function extract_square_brackets(formula::String)
+    extracted = Dict{String, Int}()
+    remaining_formula = ""
+    i = 1
+    len = length(formula)
+    
+    while i <= len
+        c = formula[i]
+        
+        if c == '['  # Start of square bracket
+            start_idx = i
+            while i <= len && formula[i] != ']'
+                i += 1
+            end
+            
+            if i > len
+                throw(ArgumentError("Mismatched square brackets"))
+            end
+
+            element_inside_brackets = formula[start_idx+1:i-1]
+            i += 1  # Move past the closing ']'
+            
+            # Check for a following multiplier
+            multiplier = 1
+            start_digit = i
+            
+            while i <= len && isdigit(formula[i])
+                i += 1
+            end
+            
+            if start_digit != i
+                multiplier = parse(Int, formula[start_digit:i-1])
+            end
+            
+            extracted[element_inside_brackets] = get(extracted, element_inside_brackets, 0) + multiplier
+            
+        else
+            remaining_formula *= c
+            i += 1
+        end
+    end
+    
+    return extracted, remaining_formula
+end
+
+function parse_formula_without_isotopes(remaining_formula::String)
+    parsed = Dict{String, Int}()
+    len = length(remaining_formula)
+    i = 1
+    current_element = ""
+    while i <= len
+        c = remaining_formula[i]
+        if isuppercase(c)
+            if current_element != ""
+                parsed[current_element] = get(parsed, current_element, 0) + 1
+            end
+            current_element = string(c)
+        elseif islowercase(c)
+            current_element *= c
+        elseif isdigit(c)
+            start_idx = i
+            while i <= len && isdigit(remaining_formula[i])
+                i += 1
+            end
+            multiplier = parse(Int, remaining_formula[start_idx:i-1])
+            parsed[current_element] = get(parsed, current_element, 0) + multiplier
+            current_element = ""
+            continue  # Skip the rest of the loop
+        end
+        i += 1
+    end
+    # If an element is left over at the end
+    if current_element != ""
+        parsed[current_element] = get(parsed, current_element, 0) + 1
+    end
+    return parsed
+end
+
+function parse_formula(formula::String)
+    expanded = expand_round_brackets(formula)
+    extracted, remaining_formula = extract_square_brackets(expanded)
+    if length(remaining_formula) > 0
+        parsed_remaining = parse_formula_without_isotopes(remaining_formula)
+        parsed_formula = merge(+, extracted, parsed_remaining)
+    else
+        parsed_formula = extracted
+    end
+
+    return parsed_formula
+end
 
 function convolve(distro1, distro2, abundance_cutoff)
   new_distribution = Dict{Float64, Float64}()
@@ -168,8 +235,11 @@ end
 
 function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=10000, adduct::String="", print=true)  # Default resolution R = 10000
   # Validate formula format, abundance cutoff, and mass resolution
-  if !occursin(r"^([A-Z][a-z]*\d*)*(\([\w]+\)\d*)*$", formula) || abundance_cutoff < 0 || R <= 0
+  if !occursin(r"^[A-Za-z\[\]\d\(\)]+$", formula) || abundance_cutoff < 0 || R <= 0
     throw(ArgumentError("Invalid input parameters"))
+  end
+  if !(count(x -> x == '(', formula) == count(x -> x == ')', formula))
+    throw(ArgumentError("Incomplete brackets"))
   end
   parsed_formula = parse_formula(formula)
     
@@ -254,7 +324,7 @@ function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=10000, adduct
         format_pad = Printf.Format("%"*string(15-length(mm)+length(aa))*"s")
         padIO = IOBuffer(); Printf.format(padIO, format_pad, aa); pad = String(take!(padIO))
         #padIO = IOBuffer(); @printf(padIO, "%14s", aa); pad = String(take!(padIO))
-
+git
         output *= mm * pad *"\n"
     end
     output *= "Found $(length(final_distribution)) isotopic masses for $abundance_cutoff abundance limit."
