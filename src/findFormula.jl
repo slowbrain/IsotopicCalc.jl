@@ -22,7 +22,7 @@ function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, addu
             O = current[findfirst(isequal("O"), elements)]
             
             # Apply heuristic rules
-            if H >= 0.5C && O <= C
+            if H >= 0.5C
                 M = sum(current[i] * ELEMENTS[elements[i]]["Relative Atomic Mass"][1] for i in eachindex(elements)) + adduct_mass - charge*0.0005485
                 mz_calculated = charge == 0 ? M : M / abs(charge)
                 formula = join([string(elements[i], current[i] == 1 ? "" : current[i]) for i in 1:length(elements) if current[i] > 0])
