@@ -1,3 +1,23 @@
+"""
+    Compound
+
+Data structure representing a molecular formula match from mass spectrometry data.
+
+# Fields
+- `formula::String`: Molecular formula (e.g., "C3H6O")
+- `adduct::String`: Adduct type (e.g., "M+H", "M+Na", or "" for none)
+- `charge::Int`: Charge state (positive, negative, or 0 for neutral)
+- `mz::Float64`: Calculated m/z value in atomic mass units
+- `ppm::Float64`: Mass accuracy in parts per million (ppm)
+
+# Examples
+```julia
+julia> compound = Compound("C3H6O", "M+H", 1, 59.049141, -0.7)
+Compound("C3H6O", "M+H", 1, 59.049141, -0.7)
+```
+
+See also: [`findFormula`](@ref)
+"""
 struct Compound
     formula::String
     adduct::String
@@ -6,8 +26,34 @@ struct Compound
     ppm::Float64
 end
 
+"""
+Dictionary of common mass spectrometry adduct masses in atomic mass units (amu).
+
+# Supported Adducts
+- "M+H": Proton adduct (+1.00783 amu)
+- "M+Na": Sodium adduct (+22.98977 amu)
+- "M+K": Potassium adduct (+38.96371 amu)
+- "M-H": Deprotonated (-1.00783 amu)
+"""
 const ADDUCTS = Dict("M+H" => 1.00782503223, "M+Na" => 22.989769282, "M+K" => 38.9637064864, "M-H" => -1.00782503223)
 
+"""
+    generate_formulas(mz_input, atom_pool, adduct, charge) -> Vector{Compound}
+
+Generate all possible molecular formulas within the atom pool constraints.
+
+Uses combinatorial search with chemical heuristics to enumerate formulas.
+Currently applies H ≥ 0.5×C rule to reduce search space.
+
+# Arguments
+- `mz_input::Float64`: Target m/z value
+- `atom_pool::Dict{String, Int}`: Maximum atom counts per element
+- `adduct::String`: Adduct type (from ADDUCTS dictionary)
+- `charge::Int`: Charge state
+
+# Returns
+- `Vector{Compound}`: All generated formulas (before tolerance filtering)
+"""
 function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, adduct::String, charge::Int)
     formulas = []
     adduct_mass = get(ADDUCTS, adduct, 0.0)
@@ -47,10 +93,77 @@ function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, addu
     return formulas
 end
 
+"""
+    filter_formulas(formulas, mz_input, tolerance) -> Vector{Compound}
+
+Filter formulas by mass accuracy tolerance.
+
+# Arguments
+- `formulas`: Vector of Compound objects to filter
+- `mz_input`: Target m/z value (not currently used, kept for API consistency)
+- `tolerance`: Maximum acceptable ppm error
+
+# Returns
+- `Vector{Compound}`: Formulas with |ppm| ≤ tolerance
+"""
 function filter_formulas(formulas, mz_input, tolerance)
     return filter(c -> abs(c.ppm) <= tolerance, formulas)
 end
 
+"""
+    findFormula(mz_input::Float64; tolerance_ppm=100, atom_pool=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10), adduct="", charge=0)
+
+Find possible molecular formulas matching an experimental m/z value.
+
+This function performs a combinatorial search through possible elemental compositions
+to find formulas that match the input mass within a specified tolerance. Results are
+sorted by mass accuracy (ppm error).
+
+# Arguments
+- `mz_input::Float64`: Experimental m/z value to match
+- `tolerance_ppm::Number=100`: Mass tolerance in parts per million (default: 100 ppm)
+- `atom_pool::Dict{String, Int}=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10)`:
+  Dictionary specifying maximum atom counts for each element to consider
+- `adduct::String=""`: Adduct type - one of "M+H", "M+Na", "M+K", "M-H", or "" for none
+- `charge::Int=0`: Charge state (positive or negative integer, or 0 for neutral)
+
+# Returns
+- `Vector{Compound}`: Array of matching formulas sorted by ppm error (best matches first)
+
+# Examples
+```julia
+julia> findFormula(58.0419)
+Matching formulas:
+ C3H6O  m/z: 58.041865  ppm: 0.61
+
+julia> findFormula(46.000; tolerance_ppm=2000, charge=1)
+Matching formulas:
+ CH2O2+ m/z: 46.004931  ppm: -107.18
+ NO2+   m/z: 45.992355  ppm: 166.23
+ ...
+
+julia> findFormula(59.0491; adduct="M+H", charge=1)
+Matching formulas:
+ C3H6O  [M+H]+  m/z: 59.049141  ppm: -0.7
+
+julia> # Custom atom pool for peptide search
+julia> findFormula(150.05, atom_pool=Dict("C"=>10, "H"=>20, "N"=>5, "O"=>5, "S"=>2))
+```
+
+# Notes
+- Uses chemical heuristics to prune search space (e.g., H ≥ 0.5×C)
+- Larger atom pools increase computation time exponentially
+- For high-resolution mass spec data, use smaller tolerance (e.g., 5-10 ppm)
+- Results are printed to console and also returned as a vector
+
+# Algorithm
+1. Generates all possible formula combinations within atom_pool limits
+2. Calculates theoretical m/z for each formula (including adduct/charge)
+3. Filters by ppm tolerance
+4. Sorts by absolute ppm error (lowest error first)
+
+See also: [`isotopicPattern`](@ref), [`monoisotopicMass`](@ref), [`Compound`](@ref)
+"""
 function findFormula(mz_input::Float64; tolerance_ppm::Number=100, atom_pool::Dict{String, Int}=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10), adduct::String="", charge::Int=0)
     formulas = generate_formulas(mz_input, atom_pool, adduct, charge)
     matching_formulas = filter_formulas(formulas, mz_input, tolerance_ppm)
