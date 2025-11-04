@@ -87,7 +87,7 @@ function extract_square_brackets(formula::String)
             end
             
             if i > len
-                throw(ArgumentError("Mismatched square brackets"))
+                throw(ArgumentError("Mismatched square brackets in formula '$formula': opening '[' at position $start_idx has no closing ']'. Use square brackets for isotopes like [13C] or [2H]."))
             end
 
             element_inside_brackets = formula[start_idx+1:i-1]
@@ -390,11 +390,22 @@ See also: [`monoisotopicMass`](@ref), [`isotopicPatternProtonated`](@ref), [`fin
 """
 function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=10000, adduct::String="", print=true)  # Default resolution R = 10000
   # Validate formula format, abundance cutoff, and mass resolution
-  if !occursin(FORMULA_VALIDATION_REGEX, formula) || abundance_cutoff < 0 || R <= 0
-    throw(ArgumentError("Invalid input parameters"))
+  if isempty(strip(formula))
+    throw(ArgumentError("Formula cannot be empty. Provide a chemical formula like 'H2O', 'C6H12O6', or 'CH3COOH'."))
+  end
+  if !occursin(FORMULA_VALIDATION_REGEX, formula)
+    throw(ArgumentError("Invalid formula '$formula'. Use only letters, numbers, parentheses (), and square brackets []. Examples: 'C3H6O', '(CH3)2CO', '[13C]H3COCH3'"))
+  end
+  if abundance_cutoff < 0
+    throw(ArgumentError("abundance_cutoff must be non-negative (got $abundance_cutoff). Use values like 1e-5 for 0.001% cutoff."))
+  end
+  if R <= 0
+    throw(ArgumentError("Resolution R must be positive (got $R). Typical values: 1000-100000 (e.g., R=10000 for FT-ICR)."))
   end
   if !(count(x -> x == '(', formula) == count(x -> x == ')', formula))
-    throw(ArgumentError("Incomplete brackets"))
+    open_count = count(x -> x == '(', formula)
+    close_count = count(x -> x == ')', formula)
+    throw(ArgumentError("Unbalanced parentheses in formula '$formula': $open_count opening '(' but $close_count closing ')'. Each '(' must have a matching ')'."))
   end
   parsed_formula = parse_formula(formula)
   # Cache the formatted formula string to avoid duplicate parsing
@@ -422,11 +433,14 @@ function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=10000, adduct
           # Handle specific isotopes
           base_element = get_base_element(atom)
           if !haskey(ELEMENTS, base_element)
-              throw(ArgumentError("Unknown element $base_element derived from isotope $atom"))
+              # Suggest common elements
+              common_elements = ["H", "C", "N", "O", "P", "S", "F", "Cl", "Br", "I", "Na", "K", "Ca", "Fe"]
+              throw(ArgumentError("Unknown element '$base_element' (from '$atom'). Common elements: $(join(common_elements, ", ")). Check spelling and capitalization."))
           end
           isotope_index = findfirst(x -> x == atom, ELEMENTS[base_element]["Symbol"])
           if isnothing(isotope_index)
-              throw(ArgumentError("Unknown isotope $atom found in formula"))
+              available_isotopes = join(ELEMENTS[base_element]["Symbol"], ", ")
+              throw(ArgumentError("Unknown isotope '$atom'. Available isotopes of $base_element: $available_isotopes. Use bracket notation like [13C] or [2H]."))
           end
           masses = [ELEMENTS[base_element]["Relative Atomic Mass"][isotope_index]]
           abundances = [1.0]  # Specific isotopes are considered to have 100% abundance
