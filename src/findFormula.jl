@@ -55,26 +55,52 @@ Currently applies H ≥ 0.5×C rule to reduce search space.
 - `Vector{Compound}`: All generated formulas (before tolerance filtering)
 """
 function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, adduct::String, charge::Int)
-    formulas = []
+    formulas = Compound[]  # Type-stable array initialization
     adduct_mass = get(ADDUCTS, adduct, 0.0)
     
     function generate_combinations(elements, counts, idx, current)
         if idx > length(elements)
-            
             # Extract the counts of C, H, N, and O from 'current'
-            C = current[findfirst(isequal("C"), elements)]
-            H = current[findfirst(isequal("H"), elements)]
-            N = current[findfirst(isequal("N"), elements)]
-            O = current[findfirst(isequal("O"), elements)]
-            
-            # Apply heuristic rules
-            if H >= 0.5C
-                M = sum(current[i] * ELEMENTS[elements[i]]["Relative Atomic Mass"][1] for i in eachindex(elements)) + adduct_mass - charge*0.0005485
-                mz_calculated = charge == 0 ? M : M / abs(charge)
-                formula = join([string(elements[i], current[i] == 1 ? "" : current[i]) for i in 1:length(elements) if current[i] > 0])
-                ppm = ((mz_input - mz_calculated) / mz_calculated) * 1e6
-                push!(formulas, Compound(formula, adduct, charge, mz_calculated, ppm))
+            c_idx = findfirst(isequal("C"), elements)
+            h_idx = findfirst(isequal("H"), elements)
+            n_idx = findfirst(isequal("N"), elements)
+            o_idx = findfirst(isequal("O"), elements)
+
+            C = isnothing(c_idx) ? 0 : current[c_idx]
+            H = isnothing(h_idx) ? 0 : current[h_idx]
+            N = isnothing(n_idx) ? 0 : current[n_idx]
+            O = isnothing(o_idx) ? 0 : current[o_idx]
+
+            # Apply chemical heuristic rules to prune invalid formulas
+            # Rule 1: Hydrogen ratio - H should be at least 0.5*C but not more than 2*C+2+N
+            if C > 0 && (H < 0.5 * C || H > 2 * C + 2 + N)
+                return
             end
+
+            # Rule 2: O/C ratio - typically <= 3 for organic compounds
+            if C > 0 && O > 3 * C
+                return
+            end
+
+            # Rule 3: N/C ratio - typically <= 4 for organic compounds
+            if C > 0 && N > 4 * C
+                return
+            end
+
+            # Rule 4: DBE (Double Bond Equivalents) must be >= 0
+            # DBE = (2C + 2 + N - H) / 2
+            # For this to be valid: 2C + 2 + N >= H
+            if 2 * C + 2 + N < H
+                return
+            end
+
+            # Calculate mass and ppm
+            M = sum(current[i] * ELEMENTS[elements[i]]["Relative Atomic Mass"][1] for i in eachindex(elements)) + adduct_mass - charge*0.0005485
+            mz_calculated = charge == 0 ? M : M / abs(charge)
+            formula = join([string(elements[i], current[i] == 1 ? "" : current[i]) for i in 1:length(elements) if current[i] > 0])
+            ppm = ((mz_input - mz_calculated) / mz_calculated) * 1e6
+            push!(formulas, Compound(formula, adduct, charge, mz_calculated, ppm))
+
             return
         end
         for count in 0:counts[idx]
@@ -84,11 +110,13 @@ function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, addu
     end
     
     elements = collect(keys(atom_pool))
-    max_counts = []
-    for elem in elements
-        push!(max_counts,minimum([atom_pool[elem],round(Int, mz_input/ELEMENTS[elem]["Relative Atomic Mass"][1])]))
+    n_elements = length(elements)
+    max_counts = Vector{Int}(undef, n_elements)
+    for i in 1:n_elements
+        elem = elements[i]
+        max_counts[i] = min(atom_pool[elem], round(Int, mz_input / ELEMENTS[elem]["Relative Atomic Mass"][1]))
     end
-    generate_combinations(elements, max_counts, 1, zeros(Int, length(elements)))
+    generate_combinations(elements, max_counts, 1, zeros(Int, n_elements))
     
     return formulas
 end

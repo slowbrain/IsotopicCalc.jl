@@ -1,3 +1,8 @@
+# Pre-compiled regex patterns for better performance
+const FORMULA_VALIDATION_REGEX = r"^[A-Za-z\[\]\d\(\)]+$"
+const CHARGE_PATTERN_REGEX = r"\((\d+)([+-])\)"
+const CHARGE_REMOVAL_REGEX = r"\(\d+[+-]\)"
+
 # Parse the molecular formula
 """
     expand_round_brackets(formula::String) -> String
@@ -313,8 +318,8 @@ function extract_charge(adduct::String)
   if adduct == "-" return 1 end
 
   # Handle other formats with regex
-  if occursin(r"\((\d+)([+-])\)", adduct)
-      match_data = match(r"\((\d+)([+-])\)", adduct)
+  if occursin(CHARGE_PATTERN_REGEX, adduct)
+      match_data = match(CHARGE_PATTERN_REGEX, adduct)
       charge_num = parse(Int, match_data.captures[1])
       charge_sign = match_data.captures[2]
       return charge_sign == "+" ? -charge_num : charge_num  # Return negative for cationic and positive for anionic
@@ -385,19 +390,21 @@ See also: [`monoisotopicMass`](@ref), [`isotopicPatternProtonated`](@ref), [`fin
 """
 function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=10000, adduct::String="", print=true)  # Default resolution R = 10000
   # Validate formula format, abundance cutoff, and mass resolution
-  if !occursin(r"^[A-Za-z\[\]\d\(\)]+$", formula) || abundance_cutoff < 0 || R <= 0
+  if !occursin(FORMULA_VALIDATION_REGEX, formula) || abundance_cutoff < 0 || R <= 0
     throw(ArgumentError("Invalid input parameters"))
   end
   if !(count(x -> x == '(', formula) == count(x -> x == ')', formula))
     throw(ArgumentError("Incomplete brackets"))
   end
   parsed_formula = parse_formula(formula)
-    
+  # Cache the formatted formula string to avoid duplicate parsing
+  formula_display = sum_formula(parsed_formula)
+
   # If an adduct is provided, parse and combine it with the base formula
   if !isempty(adduct)
-      parsed_adduct = parse_formula(replace(adduct, r"\(\d+[+-]\)" => ""))  # Remove charge info for parsing
+      parsed_adduct = parse_formula(replace(adduct, CHARGE_REMOVAL_REGEX => ""))  # Remove charge info for parsing
       parsed_formula = combine_formulas(parsed_formula, parsed_adduct)
-      
+
       # Extract charge from adduct and adjust electron count
       charge = extract_charge(adduct)
       parsed_formula["e"] = get(parsed_formula, "e", 0) + charge
@@ -450,7 +457,7 @@ function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=10000, adduct
 
   if print
     # Format the output
-    output = "\nFormula: \e[1;32m $(sum_formula(parse_formula(formula)))"
+    output = "\nFormula: \e[1;32m $formula_display"
     if !isempty(adduct)
         output *= ".$adduct"
     end
