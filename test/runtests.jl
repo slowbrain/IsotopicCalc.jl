@@ -9,5 +9,5 @@ using Test
     adduct = "M+H"
     charge = 1
 
-    @test find_compounds(mz_input, tolerance, atom_pool, adduct, charge) == [Compound("CH4O", "M+H", 1, 33.03349128072001, 15.400106385027454)]
+    @test findFormula(mz_input, tolerance_ppm=tolerance, atom_pool=atom_pool, adduct=adduct, charge=charge) == [Compound("CH4O", "M+H", 1, 33.03349128072001, 15.400106385027454)]
 end

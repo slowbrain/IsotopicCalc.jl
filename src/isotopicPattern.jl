@@ -311,20 +311,17 @@ function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=10000, adduct
     output *= "----------------------------\n"
     for (m, a) in final_distribution
         # mass formated to 4 decimal point even padded with zero if necessary
-        # mIO = IOBuffer(); @printf(mIO, "%.4f", m); mm = String(take!(mIO))
         m_round = Printf.Format("%."*string(maximum([3, round(Int, 1-log10((m/R)/3))]))*"f")
         mIO = IOBuffer(); Printf.format(mIO, m_round, m); mm = String(take!(mIO))
 
         # abbundance in % formated to 3 decimal point even padded with zero if necessary
-        # aIO = IOBuffer(); @printf(aIO, "%.3f", a*100); aa = String(take!(aIO))
         a_round = Printf.Format("%."*string(round(Int,1+log(10,1/abundance_cutoff/100)))*"f")
         aIO = IOBuffer(); Printf.format(aIO, a_round, a*100); aa = String(take!(aIO))
 
         # padding list dependent on mass
         format_pad = Printf.Format("%"*string(15-length(mm)+length(aa))*"s")
         padIO = IOBuffer(); Printf.format(padIO, format_pad, aa); pad = String(take!(padIO))
-        #padIO = IOBuffer(); @printf(padIO, "%14s", aa); pad = String(take!(padIO))
-        
+
         output *= mm * pad *"\n"
     end
     output *= "Found $(length(final_distribution)) isotopic masses for $abundance_cutoff abundance limit."
@@ -333,8 +330,6 @@ function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=10000, adduct
   end
   return final_distribution
 end
-
-# isopat(x...) = isotopicPattern(x...)
 
 # special cases
 isotopicPatternProtonated(x) = isotopicPattern(x; adduct="H+")
