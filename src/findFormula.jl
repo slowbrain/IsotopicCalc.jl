@@ -97,7 +97,31 @@ function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, addu
             # Calculate mass and ppm
             M = sum(current[i] * ELEMENTS[elements[i]]["Relative Atomic Mass"][1] for i in eachindex(elements)) + adduct_mass - charge*0.0005485
             mz_calculated = charge == 0 ? M : M / abs(charge)
-            formula = join([string(elements[i], current[i] == 1 ? "" : current[i]) for i in 1:length(elements) if current[i] > 0])
+            # Construct formula string in Hill notation order
+            # Hill notation: C first, H second (if C is present), then all other elements alphabetically
+            hill_elements = String[]
+            hill_counts = Int[]
+            c_idx = findfirst(isequal("C"), elements)
+            h_idx = findfirst(isequal("H"), elements)
+
+            if !isnothing(c_idx) && current[c_idx] > 0
+                push!(hill_elements, "C")
+                push!(hill_counts, current[c_idx])
+                if !isnothing(h_idx) && current[h_idx] > 0
+                    push!(hill_elements, "H")
+                    push!(hill_counts, current[h_idx])
+                end
+            end
+
+            # Add remaining elements (excluding C and H) in alphabetical order
+            remaining_idxs = [i for i in 1:length(elements) if current[i] > 0 && elements[i] != "C" && elements[i] != "H"]
+            sorted_remaining = sort([(elements[i], current[i]) for i in remaining_idxs], by=x->x[1])
+            for (el, cnt) in sorted_remaining
+                push!(hill_elements, el)
+                push!(hill_counts, cnt)
+            end
+
+            formula = join([string(hill_elements[i], hill_counts[i] == 1 ? "" : hill_counts[i]) for i in 1:length(hill_elements)])
             ppm = ((mz_input - mz_calculated) / mz_calculated) * 1e6
             push!(formulas, Compound(formula, adduct, charge, mz_calculated, ppm))
 
