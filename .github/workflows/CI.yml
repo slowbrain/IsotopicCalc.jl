@@ -44,22 +44,22 @@ jobs:
             version: '1.10'
             arch: x86
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
 
-      - uses: julia-actions/setup-julia@1e60fb197b9d262d0a6271958b8ea0fc51e0d0c9 # v2.7.0
+      - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
 
-      - uses: julia-actions/cache@ac5cfc7a72c3f0b53be5b66be579c1d9d6f9b030 # v2.0.6
+      - uses: julia-actions/cache@v2
 
-      - uses: julia-actions/julia-buildpkg@90dd6f23eb49626e4e6612cb9d64d456f86e6a1c # v1.6.0
+      - uses: julia-actions/julia-buildpkg@v1
 
-      - uses: julia-actions/julia-runtest@79a7e100883947123f8263c5f06e6c0ea3eb972f # v1.10.0
+      - uses: julia-actions/julia-runtest@v1
 
-      - uses: julia-actions/julia-processcoverage@03114f09f119417c3242a9fb6e0b722676aedf38 # v1.2.2
+      - uses: julia-actions/julia-processcoverage@v1
 
-      - uses: codecov/codecov-action@015f24e6818733317a2da2edd6290ab26238649a # v5.0.7
+      - uses: codecov/codecov-action@v4
         with:
           files: lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -73,9 +73,9 @@ jobs:
       contents: write
       statuses: write
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
 
-      - uses: julia-actions/setup-julia@1e60fb197b9d262d0a6271958b8ea0fc51e0d0c9 # v2.7.0
+      - uses: julia-actions/setup-julia@v2
         with:
           version: '1.10'
 
@@ -86,9 +86,9 @@ jobs:
           Pkg.develop(PackageSpec(path=pwd()))
           Pkg.instantiate()
 
-      - uses: julia-actions/julia-buildpkg@90dd6f23eb49626e4e6612cb9d64d456f86e6a1c # v1.6.0
+      - uses: julia-actions/julia-buildpkg@v1
 
-      - uses: julia-actions/julia-docdeploy@6f8f2ccb833af11498cedee7e05f0c1c57c6a156 # v1.3.1
+      - uses: julia-actions/julia-docdeploy@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
