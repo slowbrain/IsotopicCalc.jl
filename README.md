@@ -158,7 +158,7 @@ findFormula(mz_input::Float64;
            )
 ```
  By default algorithm searches within an interval of 100 ppm around monoisotopic mass and takes into consideration C, H, O, N to be possible building atoms. The associated numbers mean maximum amount of respective atoms to be considered.
-So far adducts can be one of following `M+H`, `M+Na`, `M+K`, `M-H` and charge is to be expresed separately as in example.
+So far adducts can be one of following `M+H`, `M+Na`, `M+K`, `M-H` and charge is to be expressed separately as in example.
 
 ```julia
 julia> findFormula(46.000; tolerance_ppm=2000, charge=1);
