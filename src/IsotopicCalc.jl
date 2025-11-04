@@ -7,6 +7,6 @@ module IsotopicCalc
     include("isotopicPattern.jl")
     include("findFormula.jl")
 
-    export isotopicPattern, monoisotopicMass, isotopicPatternProtonated, monoisotopicMassProtonated, findFormula
+    export isotopicPattern, monoisotopicMass, isotopicPatternProtonated, monoisotopicMassProtonated, findFormula, Compound
 
 end # module
