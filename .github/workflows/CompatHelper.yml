@@ -19,14 +19,14 @@ jobs:
         continue-on-error: true
 
       - name: Install Julia, but only if it is not already available in the PATH
-        uses: julia-actions/setup-julia@780022b48dfc0c2c6b94cfee6a9284850107d037 # v2.3.0
+        uses: julia-actions/setup-julia@1e60fb197b9d262d0a6271958b8ea0fc51e0d0c9 # v2.7.0
         with:
           version: '1.10'
           arch: x64
         if: steps.julia_in_path.outcome != 'success'
 
       - name: Run CompatHelper
-        uses: julia-actions/CompatHelper@4bc955470c5ccf29b0930036fd1d5b8a51c9c0eb # v3.6.1
+        uses: julia-actions/CompatHelper@d847e1a9c1f4aa4c3e5ddfc8bf3b84b8b8759c65 # v3.6.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           pr_labels: 'dependencies'
