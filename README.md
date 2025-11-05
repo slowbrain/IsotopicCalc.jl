@@ -1,7 +1,8 @@
 ## IsotopicCalc
 
-<!-- [![Coverage](https://codecov.io/gh/slowbrain/IsotopicCalc.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/slowbrain/IsotopicCalc.jl)
-[![PkgEval](https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/I/IsotopicCalc.svg)](https://JuliaCI.github.io/NanosoldierReports/pkgeval_badges/report.html) -->
+[![CI](https://github.com/slowbrain/IsotopicCalc.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/slowbrain/IsotopicCalc.jl/actions/workflows/CI.yml)
+[![codecov](https://codecov.io/gh/slowbrain/IsotopicCalc.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/slowbrain/IsotopicCalc.jl)
+[![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
 
 ### Installation
 To install run one of the following commands:
