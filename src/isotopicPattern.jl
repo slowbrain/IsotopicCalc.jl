@@ -221,7 +221,8 @@ function convolve(distro1, distro2, abundance_cutoff::Real)::Vector{Tuple{Float6
       end
   end
 
-  return sort(collect(new_distribution))
+  # Convert Pairs to Tuples explicitly
+  return sort([(k, v) for (k, v) in new_distribution])
 end
 
 """
@@ -266,17 +267,18 @@ because Δm/m = 0.005/100 = 5×10⁻⁵ > 1/10000 = 1×10⁻⁴
 """
 function group_by_resolution(distribution::Vector{Tuple{Float64, Float64}}, R::Real)::Vector{Tuple{Float64, Float64}}
   grouped = Dict{Float64, Float64}()
-  
+
   for (m, a) in distribution
       Δm = m / R
       # Round the mass based on Δm and ensure a minimum of 3 decimal places
       rounded_mass = round(m, digits=maximum([3, round(Int, 1-log10(Δm/3))]))
-      
+
       # Group by the rounded mass and sum the abundances
       grouped[rounded_mass] = get(grouped, rounded_mass, 0.0) + a
   end
-  
-  return sort(collect(grouped))
+
+  # Convert Pairs to Tuples explicitly
+  return sort([(k, v) for (k, v) in grouped])
 end
 
 function get_base_element(isotope::String)
