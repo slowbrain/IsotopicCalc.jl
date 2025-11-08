@@ -26,7 +26,7 @@ jobs:
         if: steps.julia_in_path.outcome != 'success'
 
       - name: Run CompatHelper
-        uses: julia-actions/CompatHelper@v3
+        uses: JuliaRegistries/compathelper-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           pr_labels: 'dependencies'
