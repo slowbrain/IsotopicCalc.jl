@@ -88,7 +88,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking Changes
 
-None. All changes are backward compatible.
+⚠️ **Important:** This is a breaking release (0.2.x → 0.3.0)
+
+1. **Return Type Change in Core Functions** (commit 6747b86)
+   - `convolve()` and `group_by_resolution()` now return `Vector{Tuple{Float64, Float64}}` instead of `Vector{Pair{Float64, Float64}}`
+   - **Migration Guide:** If your code relies on the returned values, update pattern matching:
+     ```julia
+     # Old code (may have worked with Pairs):
+     result = convolve(dist1, dist2, cutoff)
+     # Pairs used .first and .second
+
+     # New code (uses Tuples):
+     result = convolve(dist1, dist2, cutoff)
+     # Tuples indexed with [1] and [2], or destructured with (mass, abundance)
+     ```
+   - This change ensures type consistency with declared return types and improves compatibility with newer Julia versions
+
+2. **Exported `Compound` Struct**
+   - The `Compound` struct is now publicly exported
+   - **Impact:** If you have your own `Compound` type defined, you may experience naming conflicts
+   - **Migration Guide:** Either rename your local `Compound` type or use qualified imports:
+     ```julia
+     import IsotopicCalc: isotopicPattern  # Import specific functions without Compound
+     ```
 
 ### Deprecations
 
