@@ -52,12 +52,18 @@ See also: README.md for detailed examples and CITATION.bib for citing this packa
 """
 module IsotopicCalc
 
-    using JSON, Printf
+    using JSON
 
+    # Load element data that will be used by submodules
     const ELEMENTS = JSON.parsefile(Base.Filesystem.joinpath(dirname(@__FILE__),"elements.json"));
 
-    include("isotopicPattern.jl")
-    include("findFormula.jl")
+    # Include and load submodules
+    include("IsotopicPattern.jl")
+    include("FindFormula.jl")
+
+    # Import and re-export functions from submodules
+    using .IsotopicPatternModule: isotopic_pattern, monoisotopic_mass, isotopic_pattern_protonated, monoisotopic_mass_protonated
+    using .FindFormulaModule: Compound, find_formula
 
     export isotopic_pattern, monoisotopic_mass, isotopic_pattern_protonated, monoisotopic_mass_protonated, find_formula, Compound
 
