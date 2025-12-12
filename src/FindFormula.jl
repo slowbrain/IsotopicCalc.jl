@@ -1,7 +1,11 @@
 module FindFormulaModule
 
 # Access ELEMENTS from parent module
-const ELEMENTS = isdefined(parentmodule(@__MODULE__), :ELEMENTS) ? parentmodule(@__MODULE__).ELEMENTS : Dict()
+const ELEMENTS = if isdefined(parentmodule(@__MODULE__), :ELEMENTS)
+    parentmodule(@__MODULE__).ELEMENTS
+else
+    error("ELEMENTS constant not found in parent module. Ensure IsotopicCalc is properly initialized with elements.json data.")
+end
 
 """
     Compound
@@ -59,8 +63,13 @@ Dictionary of common mass spectrometry adducts.
 - "Na+": Sodium adduct [M+Na]+ (+22.98977 amu, charge +1)
 - "K+": Potassium adduct [M+K]+ (+38.96371 amu, charge +1)
 - "H-": Deprotonated [M-H]- (-1.00783 amu, charge -1)
-- "+": Radical cation [M]+• (-0.00055 amu, charge +1)
+- "+": Radical cation [M]+• (charge +1, electron mass correction applied during calculation)
 - "": Neutral molecule (0 amu, charge 0)
+
+# Notes
+For charged species, electron mass correction (-0.0005485 amu per positive charge,
++0.0005485 amu per negative charge) is automatically applied during m/z calculation.
+The radical cation "+" has no additional mass shift beyond the electron correction.
 """
 const ADDUCTS = Dict(
     "H+" => AdductInfo(1.00782503223, 1, "M+H"),
@@ -100,6 +109,59 @@ function get_adduct_info(adduct::String)
         throw(ArgumentError("Unknown adduct '$adduct'. Supported adducts: $valid_adducts"))
     end
     return ADDUCTS[adduct]
+end
+
+"""
+    build_hill_notation(elements, current) -> String
+
+Construct a formula string in Hill notation order.
+
+Hill notation rules:
+- With carbon: C first, H second, then others alphabetically
+- Without carbon: All elements alphabetically (including H)
+
+# Arguments
+- `elements::Vector{String}`: Element symbols
+- `current::Vector{Int}`: Corresponding element counts
+
+# Returns
+- `String`: Formula in Hill notation (e.g., "C3H6O")
+"""
+function build_hill_notation(elements::Vector{String}, current::Vector{Int})
+    hill_elements = String[]
+    hill_counts = Int[]
+    c_idx = findfirst(isequal("C"), elements)
+    h_idx = findfirst(isequal("H"), elements)
+
+    # Check if carbon is present
+    has_carbon = !isnothing(c_idx) && current[c_idx] > 0
+
+    if has_carbon
+        # Carbon present: C, then H, then others alphabetically
+        push!(hill_elements, "C")
+        push!(hill_counts, current[c_idx])
+        if !isnothing(h_idx) && current[h_idx] > 0
+            push!(hill_elements, "H")
+            push!(hill_counts, current[h_idx])
+        end
+        # Add remaining elements (excluding C and H) in alphabetical order
+        remaining_idxs = [i for i in 1:length(elements) if current[i] > 0 && elements[i] != "C" && elements[i] != "H"]
+        sorted_remaining = sort([(elements[i], current[i]) for i in remaining_idxs], by=x->x[1])
+        for (el, cnt) in sorted_remaining
+            push!(hill_elements, el)
+            push!(hill_counts, cnt)
+        end
+    else
+        # No carbon: All elements alphabetically (including H)
+        all_idxs = [i for i in 1:length(elements) if current[i] > 0]
+        sorted_all = sort([(elements[i], current[i]) for i in all_idxs], by=x->x[1])
+        for (el, cnt) in sorted_all
+            push!(hill_elements, el)
+            push!(hill_counts, cnt)
+        end
+    end
+
+    return join([string(hill_elements[i], hill_counts[i] == 1 ? "" : hill_counts[i]) for i in 1:length(hill_elements)])
 end
 
 """
@@ -162,44 +224,9 @@ function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, addu
             # Calculate mass and ppm
             M = sum(current[i] * ELEMENTS[elements[i]]["Relative Atomic Mass"][1] for i in eachindex(elements)) + adduct_mass - charge*0.0005485
             mz_calculated = charge == 0 ? M : M / abs(charge)
+
             # Construct formula string in Hill notation order
-            # Hill notation:
-            # - With C: C first, H second, then others alphabetically
-            # - Without C: All elements alphabetically (including H)
-            hill_elements = String[]
-            hill_counts = Int[]
-            c_idx = findfirst(isequal("C"), elements)
-            h_idx = findfirst(isequal("H"), elements)
-
-            # Check if carbon is present
-            has_carbon = !isnothing(c_idx) && current[c_idx] > 0
-
-            if has_carbon
-                # Carbon present: C, then H, then others alphabetically
-                push!(hill_elements, "C")
-                push!(hill_counts, current[c_idx])
-                if !isnothing(h_idx) && current[h_idx] > 0
-                    push!(hill_elements, "H")
-                    push!(hill_counts, current[h_idx])
-                end
-                # Add remaining elements (excluding C and H) in alphabetical order
-                remaining_idxs = [i for i in 1:length(elements) if current[i] > 0 && elements[i] != "C" && elements[i] != "H"]
-                sorted_remaining = sort([(elements[i], current[i]) for i in remaining_idxs], by=x->x[1])
-                for (el, cnt) in sorted_remaining
-                    push!(hill_elements, el)
-                    push!(hill_counts, cnt)
-                end
-            else
-                # No carbon: All elements alphabetically (including H)
-                all_idxs = [i for i in 1:length(elements) if current[i] > 0]
-                sorted_all = sort([(elements[i], current[i]) for i in all_idxs], by=x->x[1])
-                for (el, cnt) in sorted_all
-                    push!(hill_elements, el)
-                    push!(hill_counts, cnt)
-                end
-            end
-
-            formula = join([string(hill_elements[i], hill_counts[i] == 1 ? "" : hill_counts[i]) for i in 1:length(hill_elements)])
+            formula = build_hill_notation(elements, current)
             ppm = ((mz_input - mz_calculated) / mz_calculated) * 1e6
             push!(formulas, Compound(formula, adduct_info.name, charge, mz_calculated, ppm))
 
