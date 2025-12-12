@@ -3,7 +3,11 @@ module IsotopicPatternModule
 using Printf
 
 # Access ELEMENTS from parent module
-const ELEMENTS = isdefined(parentmodule(@__MODULE__), :ELEMENTS) ? parentmodule(@__MODULE__).ELEMENTS : Dict()
+const ELEMENTS = if isdefined(parentmodule(@__MODULE__), :ELEMENTS)
+    parentmodule(@__MODULE__).ELEMENTS
+else
+    error("ELEMENTS constant not found in parent module. Ensure IsotopicCalc is properly initialized with elements.json data.")
+end
 
 # Pre-compiled regex patterns for better performance
 const FORMULA_VALIDATION_REGEX = r"^[A-Za-z\[\]\d\(\)]+$"
