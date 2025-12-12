@@ -1,3 +1,8 @@
+module FindFormulaModule
+
+# Access ELEMENTS from parent module
+const ELEMENTS = isdefined(parentmodule(@__MODULE__), :ELEMENTS) ? parentmodule(@__MODULE__).ELEMENTS : Dict()
+
 """
     Compound
 
@@ -54,6 +59,7 @@ Dictionary of common mass spectrometry adducts.
 - "Na+": Sodium adduct [M+Na]+ (+22.98977 amu, charge +1)
 - "K+": Potassium adduct [M+K]+ (+38.96371 amu, charge +1)
 - "H-": Deprotonated [M-H]- (-1.00783 amu, charge -1)
+- "+": Radical cation [M]+• (-0.00055 amu, charge +1)
 - "": Neutral molecule (0 amu, charge 0)
 """
 const ADDUCTS = Dict(
@@ -61,6 +67,7 @@ const ADDUCTS = Dict(
     "Na+" => AdductInfo(22.989769282, 1, "M+Na"),
     "K+" => AdductInfo(38.9637064864, 1, "M+K"),
     "H-" => AdductInfo(-1.00782503223, -1, "M-H"),
+    "+" => AdductInfo(0.0, 1, "M"),
     "" => AdductInfo(0.0, 0, "")
 )
 
@@ -156,27 +163,40 @@ function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, addu
             M = sum(current[i] * ELEMENTS[elements[i]]["Relative Atomic Mass"][1] for i in eachindex(elements)) + adduct_mass - charge*0.0005485
             mz_calculated = charge == 0 ? M : M / abs(charge)
             # Construct formula string in Hill notation order
-            # Hill notation: C first, H second (if C is present), then all other elements alphabetically
+            # Hill notation:
+            # - With C: C first, H second, then others alphabetically
+            # - Without C: All elements alphabetically (including H)
             hill_elements = String[]
             hill_counts = Int[]
             c_idx = findfirst(isequal("C"), elements)
             h_idx = findfirst(isequal("H"), elements)
 
-            if !isnothing(c_idx) && current[c_idx] > 0
+            # Check if carbon is present
+            has_carbon = !isnothing(c_idx) && current[c_idx] > 0
+
+            if has_carbon
+                # Carbon present: C, then H, then others alphabetically
                 push!(hill_elements, "C")
                 push!(hill_counts, current[c_idx])
                 if !isnothing(h_idx) && current[h_idx] > 0
                     push!(hill_elements, "H")
                     push!(hill_counts, current[h_idx])
                 end
-            end
-
-            # Add remaining elements (excluding C and H) in alphabetical order
-            remaining_idxs = [i for i in 1:length(elements) if current[i] > 0 && elements[i] != "C" && elements[i] != "H"]
-            sorted_remaining = sort([(elements[i], current[i]) for i in remaining_idxs], by=x->x[1])
-            for (el, cnt) in sorted_remaining
-                push!(hill_elements, el)
-                push!(hill_counts, cnt)
+                # Add remaining elements (excluding C and H) in alphabetical order
+                remaining_idxs = [i for i in 1:length(elements) if current[i] > 0 && elements[i] != "C" && elements[i] != "H"]
+                sorted_remaining = sort([(elements[i], current[i]) for i in remaining_idxs], by=x->x[1])
+                for (el, cnt) in sorted_remaining
+                    push!(hill_elements, el)
+                    push!(hill_counts, cnt)
+                end
+            else
+                # No carbon: All elements alphabetically (including H)
+                all_idxs = [i for i in 1:length(elements) if current[i] > 0]
+                sorted_all = sort([(elements[i], current[i]) for i in all_idxs], by=x->x[1])
+                for (el, cnt) in sorted_all
+                    push!(hill_elements, el)
+                    push!(hill_counts, cnt)
+                end
             end
 
             formula = join([string(hill_elements[i], hill_counts[i] == 1 ? "" : hill_counts[i]) for i in 1:length(hill_elements)])
@@ -234,11 +254,12 @@ sorted by mass accuracy (ppm error).
 - `tolerance_ppm::Number=100`: Mass tolerance in parts per million (default: 100 ppm)
 - `atom_pool::Dict{String, Int}=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10)`:
   Dictionary specifying maximum atom counts for each element to consider
-- `adduct::String=""`: Adduct type - one of "H+", "Na+", "K+", "H-", or "" for neutral
+- `adduct::String=""`: Adduct type - one of "H+", "Na+", "K+", "H-", "+", or "" for neutral
   - "H+": Protonated [M+H]+ (charge +1)
   - "Na+": Sodium adduct [M+Na]+ (charge +1)
   - "K+": Potassium adduct [M+K]+ (charge +1)
   - "H-": Deprotonated [M-H]- (charge -1)
+  - "+": Radical cation [M]+• (charge +1, electron ionization)
   - "": Neutral molecule (charge 0)
 
 # Returns
@@ -257,6 +278,10 @@ Matching formulas:
 julia> find_formula(81.0284; adduct="Na+")
 Matching formulas:
  C3H6O  [M+Na]+  m/z: 81.028084  ppm: 3.9
+
+julia> find_formula(58.0419; adduct="+")
+Matching formulas:
+ C3H6O  [M]+  m/z: 58.041316  ppm: 1.01
 
 julia> # Custom atom pool for peptide search
 julia> find_formula(150.05; adduct="H+", atom_pool=Dict("C"=>10, "H"=>20, "N"=>5, "O"=>5, "S"=>2))
@@ -292,3 +317,7 @@ function find_formula(mz_input::Float64; tolerance_ppm::Number=100, atom_pool::D
     end
     return matching_formulas
 end
+
+export Compound, find_formula
+
+end # module FindFormulaModule

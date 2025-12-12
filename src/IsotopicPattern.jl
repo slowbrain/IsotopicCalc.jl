@@ -1,3 +1,10 @@
+module IsotopicPatternModule
+
+using Printf
+
+# Access ELEMENTS from parent module
+const ELEMENTS = isdefined(parentmodule(@__MODULE__), :ELEMENTS) ? parentmodule(@__MODULE__).ELEMENTS : Dict()
+
 # Pre-compiled regex patterns for better performance
 const FORMULA_VALIDATION_REGEX = r"^[A-Za-z\[\]\d\(\)]+$"
 const CHARGE_PATTERN_REGEX = r"\((\d+)([+-])\)"
@@ -589,3 +596,7 @@ julia> monoisotopic_mass_protonated("C6H12O6")
 See also: [`monoisotopic_mass`](@ref), [`isotopic_pattern_protonated`](@ref)
 """
 monoisotopic_mass_protonated(x) = isotopic_pattern(x; adduct="H+", print=false)[1][1]
+
+export isotopic_pattern, monoisotopic_mass, isotopic_pattern_protonated, monoisotopic_mass_protonated
+
+end # module IsotopicPatternModule
