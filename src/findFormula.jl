@@ -4,8 +4,8 @@
 Data structure representing a molecular formula match from mass spectrometry data.
 
 # Fields
-- `formula::String`: Molecular formula (e.g., "C3H6O")
-- `adduct::String`: Adduct type (e.g., "M+H", "M+Na", or "" for none)
+- `formula::String`: Molecular formula in Hill notation (e.g., "C3H6O")
+- `adduct::String`: Adduct display name (e.g., "M+H", "M+Na", or "" for none)
 - `charge::Int`: Charge state (positive, negative, or 0 for neutral)
 - `mz::Float64`: Calculated m/z value in atomic mass units
 - `ppm::Float64`: Mass accuracy in parts per million (ppm)
@@ -16,7 +16,11 @@ julia> compound = Compound("C3H6O", "M+H", 1, 59.049141, -0.7)
 Compound("C3H6O", "M+H", 1, 59.049141, -0.7)
 ```
 
-See also: [`findFormula`](@ref)
+# Notes
+The `adduct` field stores the display name (e.g., "M+H") for output formatting,
+while the actual adduct information (mass, charge) is handled by the `AdductInfo` struct.
+
+See also: [`find_formula`](@ref), [`AdductInfo`](@ref)
 """
 struct Compound
     formula::String
@@ -27,18 +31,72 @@ struct Compound
 end
 
 """
-Dictionary of common mass spectrometry adduct masses in atomic mass units (amu).
+    AdductInfo
+
+Data structure representing an adduct type with its mass and charge.
+
+# Fields
+- `mass::Float64`: Mass change in atomic mass units (amu)
+- `charge::Int`: Charge state (positive, negative, or 0 for neutral)
+- `name::String`: Display name for the adduct
+"""
+struct AdductInfo
+    mass::Float64
+    charge::Int
+    name::String
+end
+
+"""
+Dictionary of common mass spectrometry adducts.
 
 # Supported Adducts
-- "M+H": Proton adduct (+1.00783 amu)
-- "M+Na": Sodium adduct (+22.98977 amu)
-- "M+K": Potassium adduct (+38.96371 amu)
-- "M-H": Deprotonated (-1.00783 amu)
+- "H+": Protonated [M+H]+ (+1.00783 amu, charge +1)
+- "Na+": Sodium adduct [M+Na]+ (+22.98977 amu, charge +1)
+- "K+": Potassium adduct [M+K]+ (+38.96371 amu, charge +1)
+- "H-": Deprotonated [M-H]- (-1.00783 amu, charge -1)
+- "": Neutral molecule (0 amu, charge 0)
 """
-const ADDUCTS = Dict("M+H" => 1.00782503223, "M+Na" => 22.989769282, "M+K" => 38.9637064864, "M-H" => -1.00782503223)
+const ADDUCTS = Dict(
+    "H+" => AdductInfo(1.00782503223, 1, "M+H"),
+    "Na+" => AdductInfo(22.989769282, 1, "M+Na"),
+    "K+" => AdductInfo(38.9637064864, 1, "M+K"),
+    "H-" => AdductInfo(-1.00782503223, -1, "M-H"),
+    "" => AdductInfo(0.0, 0, "")
+)
 
 """
-    generate_formulas(mz_input, atom_pool, adduct, charge) -> Vector{Compound}
+    get_adduct_info(adduct::String) -> AdductInfo
+
+Get adduct information from an adduct string.
+
+# Arguments
+- `adduct::String`: Adduct identifier (e.g., "H+", "Na+", "K+", "H-", or "")
+
+# Returns
+- `AdductInfo`: Struct containing mass, charge, and display name
+
+# Throws
+- `ArgumentError`: If the adduct string is not recognized
+
+# Examples
+```julia
+julia> get_adduct_info("H+")
+AdductInfo(1.00782503223, 1, "M+H")
+
+julia> get_adduct_info("Na+")
+AdductInfo(22.989769282, 1, "M+Na")
+```
+"""
+function get_adduct_info(adduct::String)
+    if !haskey(ADDUCTS, adduct)
+        valid_adducts = join(sort(["\"$k\"" for k in keys(ADDUCTS)]), ", ")
+        throw(ArgumentError("Unknown adduct '$adduct'. Supported adducts: $valid_adducts"))
+    end
+    return ADDUCTS[adduct]
+end
+
+"""
+    generate_formulas(mz_input, atom_pool, adduct_info) -> Vector{Compound}
 
 Generate all possible molecular formulas within the atom pool constraints.
 
@@ -48,15 +106,15 @@ Currently applies H ≥ 0.5×C rule to reduce search space.
 # Arguments
 - `mz_input::Float64`: Target m/z value
 - `atom_pool::Dict{String, Int}`: Maximum atom counts per element
-- `adduct::String`: Adduct type (from ADDUCTS dictionary)
-- `charge::Int`: Charge state
+- `adduct_info::AdductInfo`: Adduct information (mass, charge, name)
 
 # Returns
 - `Vector{Compound}`: All generated formulas (before tolerance filtering)
 """
-function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, adduct::String, charge::Int)
+function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, adduct_info::AdductInfo)
     formulas = Compound[]  # Type-stable array initialization
-    adduct_mass = get(ADDUCTS, adduct, 0.0)
+    adduct_mass = adduct_info.mass
+    charge = adduct_info.charge
     
     function generate_combinations(elements, counts, idx, current)
         if idx > length(elements)
@@ -123,7 +181,7 @@ function generate_formulas(mz_input::Float64, atom_pool::Dict{String, Int}, addu
 
             formula = join([string(hill_elements[i], hill_counts[i] == 1 ? "" : hill_counts[i]) for i in 1:length(hill_elements)])
             ppm = ((mz_input - mz_calculated) / mz_calculated) * 1e6
-            push!(formulas, Compound(formula, adduct, charge, mz_calculated, ppm))
+            push!(formulas, Compound(formula, adduct_info.name, charge, mz_calculated, ppm))
 
             return
         end
@@ -163,7 +221,7 @@ function filter_formulas(formulas, mz_input, tolerance)
 end
 
 """
-    findFormula(mz_input::Float64; tolerance_ppm=100, atom_pool=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10), adduct="", charge=0)
+    find_formula(mz_input::Float64; tolerance_ppm=100, atom_pool=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10), adduct="")
 
 Find possible molecular formulas matching an experimental m/z value.
 
@@ -176,30 +234,32 @@ sorted by mass accuracy (ppm error).
 - `tolerance_ppm::Number=100`: Mass tolerance in parts per million (default: 100 ppm)
 - `atom_pool::Dict{String, Int}=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10)`:
   Dictionary specifying maximum atom counts for each element to consider
-- `adduct::String=""`: Adduct type - one of "M+H", "M+Na", "M+K", "M-H", or "" for none
-- `charge::Int=0`: Charge state (positive or negative integer, or 0 for neutral)
+- `adduct::String=""`: Adduct type - one of "H+", "Na+", "K+", "H-", or "" for neutral
+  - "H+": Protonated [M+H]+ (charge +1)
+  - "Na+": Sodium adduct [M+Na]+ (charge +1)
+  - "K+": Potassium adduct [M+K]+ (charge +1)
+  - "H-": Deprotonated [M-H]- (charge -1)
+  - "": Neutral molecule (charge 0)
 
 # Returns
 - `Vector{Compound}`: Array of matching formulas sorted by ppm error (best matches first)
 
 # Examples
 ```julia
-julia> findFormula(58.0419)
+julia> find_formula(58.0419)
 Matching formulas:
  C3H6O  m/z: 58.041865  ppm: 0.61
 
-julia> findFormula(46.000; tolerance_ppm=2000, charge=1)
-Matching formulas:
- CH2O2+ m/z: 46.004931  ppm: -107.18
- NO2+   m/z: 45.992355  ppm: 166.23
- ...
-
-julia> findFormula(59.0491; adduct="M+H", charge=1)
+julia> find_formula(59.0491; adduct="H+")
 Matching formulas:
  C3H6O  [M+H]+  m/z: 59.049141  ppm: -0.7
 
+julia> find_formula(81.0284; adduct="Na+")
+Matching formulas:
+ C3H6O  [M+Na]+  m/z: 81.028084  ppm: 3.9
+
 julia> # Custom atom pool for peptide search
-julia> findFormula(150.05, atom_pool=Dict("C"=>10, "H"=>20, "N"=>5, "O"=>5, "S"=>2))
+julia> find_formula(150.05; adduct="H+", atom_pool=Dict("C"=>10, "H"=>20, "N"=>5, "O"=>5, "S"=>2))
 ```
 
 # Notes
@@ -214,19 +274,20 @@ julia> findFormula(150.05, atom_pool=Dict("C"=>10, "H"=>20, "N"=>5, "O"=>5, "S"=
 3. Filters by ppm tolerance
 4. Sorts by absolute ppm error (lowest error first)
 
-See also: [`isotopicPattern`](@ref), [`monoisotopicMass`](@ref), [`Compound`](@ref)
+See also: [`isotopic_pattern`](@ref), [`monoisotopic_mass`](@ref), [`Compound`](@ref)
 """
-function findFormula(mz_input::Float64; tolerance_ppm::Number=100, atom_pool::Dict{String, Int}=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10), adduct::String="", charge::Int=0)
-    formulas = generate_formulas(mz_input, atom_pool, adduct, charge)
+function find_formula(mz_input::Float64; tolerance_ppm::Number=100, atom_pool::Dict{String, Int}=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10), adduct::String="")
+    adduct_info = get_adduct_info(adduct)
+    formulas = generate_formulas(mz_input, atom_pool, adduct_info)
     matching_formulas = filter_formulas(formulas, mz_input, tolerance_ppm)
-    
+
     # Sort the matching formulas by ppm
     sort!(matching_formulas, by = c -> abs(c.ppm))
-    
+
     println("Matching formulas:")
     for compound in matching_formulas
-        charge_sign = charge > 0 ? "+" : (charge < 0 ? "-" : "")
-        adduct_string = adduct == "" ? charge_sign : "\t[" * adduct * "]" * charge_sign
+        charge_sign = adduct_info.charge > 0 ? "+" : (adduct_info.charge < 0 ? "-" : "")
+        adduct_string = adduct_info.name == "" ? charge_sign : "\t[" * adduct_info.name * "]" * charge_sign
         println(" ", compound.formula, adduct_string, "\tm/z: ", string(round(compound.mz, digits=6)), "\tppm: ", string(round(compound.ppm, digits=2)))
     end
     return matching_formulas

@@ -5,6 +5,65 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - TBD
+
+### Breaking Changes
+
+⚠️ **This is a major breaking release with API changes**
+
+#### 1. Function Naming Convention Changes
+All exported functions now follow Julia best practices with lowercase and underscores:
+
+| Old Name (v0.3.0) | New Name (v0.4.0) |
+|-------------------|-------------------|
+| `isotopicPattern` | `isotopic_pattern` |
+| `monoisotopicMass` | `monoisotopic_mass` |
+| `isotopicPatternProtonated` | `isotopic_pattern_protonated` |
+| `monoisotopicMassProtonated` | `monoisotopic_mass_protonated` |
+| `findFormula` | `find_formula` |
+
+**Migration:** Update all function calls to use the new lowercase_with_underscores format.
+
+```julia
+# Old code (v0.3.0)
+mass = monoisotopicMass("C3H6O")
+pattern = isotopicPattern("C3H6O")
+results = findFormula(58.0419)
+
+# New code (v0.4.0)
+mass = monoisotopic_mass("C3H6O")
+pattern = isotopic_pattern("C3H6O")
+results = find_formula(58.0419)
+```
+
+#### 2. Adduct API Simplified
+- **Removed backward compatibility** for old adduct format (`"M+H"`, `"M+Na"`, `"M+K"`, `"M-H"`)
+- **Removed `charge` parameter** from `find_formula()` function
+- Only new format is supported: `"H+"`, `"Na+"`, `"K+"`, `"H-"`, `""`
+
+```julia
+# Old code (v0.3.0)
+find_formula(59.0491; adduct="M+H", charge=1)  # No longer works
+
+# New code (v0.4.0)
+find_formula(59.0491; adduct="H+")  # Required format
+```
+
+### Added
+- **`AdductInfo` struct** - New data structure encapsulating adduct mass, charge, and display name
+- **`get_adduct_info()` helper function** - Validates and retrieves adduct information with proper error handling
+
+### Changed
+- **Function naming** - All exported functions renamed to follow Julia conventions (lowercase with underscores)
+- **`find_formula()` signature** - Removed separate `charge` parameter, integrated into `adduct` parameter
+- **Internal API** - `generate_formulas()` now accepts `AdductInfo` instead of separate parameters
+- **Documentation** - Updated all examples to use new naming and adduct format
+- **Tests** - Updated all tests to use new API
+
+### Removed
+- **Old adduct format** - `"M+H"`, `"M+Na"`, `"M+K"`, `"M-H"` no longer supported
+- **`charge` parameter** - Removed from `find_formula()` function
+
 ## [0.3.0] - 2025-11-04
 
 ### Added
