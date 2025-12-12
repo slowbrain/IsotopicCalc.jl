@@ -12,11 +12,11 @@ A Julia package for calculating isotopic patterns and monoisotopic masses of che
 - Uses NIST atomic weights and isotopic composition data
 
 # Main Functions
-- [`isotopicPattern`](@ref): Calculate full isotopic distribution
-- [`monoisotopicMass`](@ref): Calculate monoisotopic mass
-- [`findFormula`](@ref): Find formulas matching an m/z value
-- [`isotopicPatternProtonated`](@ref): Convenience function for [M+H]⁺
-- [`monoisotopicMassProtonated`](@ref): Monoisotopic mass of [M+H]⁺
+- [`isotopic_pattern`](@ref): Calculate full isotopic distribution
+- [`monoisotopic_mass`](@ref): Calculate monoisotopic mass
+- [`find_formula`](@ref): Find formulas matching an m/z value
+- [`isotopic_pattern_protonated`](@ref): Convenience function for [M+H]⁺
+- [`monoisotopic_mass_protonated`](@ref): Monoisotopic mass of [M+H]⁺
 - [`Compound`](@ref): Data structure for formula search results
 
 # Example Usage
@@ -24,16 +24,16 @@ A Julia package for calculating isotopic patterns and monoisotopic masses of che
 using IsotopicCalc
 
 # Calculate isotopic pattern for acetone
-isotopicPattern("CH3COCH3")
+isotopic_pattern("CH3COCH3")
 
 # Get monoisotopic mass
-mass = monoisotopicMass("C6H12O6")  # Returns 180.0634
+mass = monoisotopic_mass("C6H12O6")  # Returns 180.0634
 
 # Find formulas matching an m/z value
-matches = findFormula(58.0419; tolerance_ppm=10)
+matches = find_formula(58.0419; tolerance_ppm=10)
 
 # Calculate pattern with adduct
-isotopicPattern("C6H12O6"; adduct="Na+")
+isotopic_pattern("C6H12O6"; adduct="Na+")
 ```
 
 # Formula Notation
@@ -59,6 +59,6 @@ module IsotopicCalc
     include("isotopicPattern.jl")
     include("findFormula.jl")
 
-    export isotopicPattern, monoisotopicMass, isotopicPatternProtonated, monoisotopicMassProtonated, findFormula, Compound
+    export isotopic_pattern, monoisotopic_mass, isotopic_pattern_protonated, monoisotopic_mass_protonated, find_formula, Compound
 
 end # module

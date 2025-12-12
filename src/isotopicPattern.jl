@@ -335,7 +335,7 @@ function extract_charge(adduct::String)
 end
 
 """
-    isotopicPattern(formula::String; abundance_cutoff=1e-5, R=10000, adduct::String="", print=true)
+    isotopic_pattern(formula::String; abundance_cutoff=1e-5, R=10000, adduct::String="", print=true)
 
 Calculate the isotopic pattern distribution for a given chemical formula.
 
@@ -361,7 +361,7 @@ abundance of each isotopologue.
 
 # Examples
 ```julia
-julia> isotopicPattern("CH3COCH3")
+julia> isotopic_pattern("CH3COCH3")
 Formula:  C3H6O
 ----------------------------
 Mass [amu]     Abundance [%]
@@ -370,10 +370,10 @@ Mass [amu]     Abundance [%]
 59.0452        3.2447
 ...
 
-julia> isotopicPattern("C6H12O6"; abundance_cutoff=1e-3, adduct="Na+")
+julia> isotopic_pattern("C6H12O6"; abundance_cutoff=1e-3, adduct="Na+")
 # Returns distribution for sodium adduct of glucose with 0.1% cutoff
 
-julia> pattern = isotopicPattern("C3H6O"; print=false)
+julia> pattern = isotopic_pattern("C3H6O"; print=false)
 # Returns data without printing (useful for programmatic access)
 ```
 
@@ -388,9 +388,9 @@ julia> pattern = isotopicPattern("C3H6O"; print=false)
   or if abundance_cutoff < 0 or R ≤ 0
 - `ArgumentError`: If unknown element or isotope is specified
 
-See also: [`monoisotopicMass`](@ref), [`isotopicPatternProtonated`](@ref), [`findFormula`](@ref)
+See also: [`monoisotopic_mass`](@ref), [`isotopic_pattern_protonated`](@ref), [`find_formula`](@ref)
 """
-function isotopicPattern(formula::String; abundance_cutoff=1e-5, R=10000, adduct::String="", print=true)  # Default resolution R = 10000
+function isotopic_pattern(formula::String; abundance_cutoff=1e-5, R=10000, adduct::String="", print=true)  # Default resolution R = 10000
   # Validate formula format, abundance cutoff, and mass resolution
   if isempty(strip(formula))
     throw(ArgumentError("Formula cannot be empty. Provide a chemical formula like 'H2O', 'C6H12O6', or 'CH3COOH'."))
@@ -506,30 +506,30 @@ end
 
 # special cases
 """
-    isotopicPatternProtonated(formula::String)
+    isotopic_pattern_protonated(formula::String)
 
 Convenience function to calculate the isotopic pattern for a protonated molecule [M+H]⁺.
 
-This is equivalent to calling `isotopicPattern(formula; adduct="H+")`.
+This is equivalent to calling `isotopic_pattern(formula; adduct="H+")`.
 
 # Arguments
-- `formula::String`: Chemical formula (same format as `isotopicPattern`)
+- `formula::String`: Chemical formula (same format as `isotopic_pattern`)
 
 # Returns
 - `Vector{Tuple{Float64, Float64}}`: Array of (mass, abundance) tuples for [M+H]⁺
 
 # Examples
 ```julia
-julia> isotopicPatternProtonated("C3H6O")
+julia> isotopic_pattern_protonated("C3H6O")
 # Calculates pattern for protonated acetone (m/z 59.049)
 ```
 
-See also: [`isotopicPattern`](@ref), [`monoisotopicMassProtonated`](@ref)
+See also: [`isotopic_pattern`](@ref), [`monoisotopic_mass_protonated`](@ref)
 """
-isotopicPatternProtonated(x) = isotopicPattern(x; adduct="H+")
+isotopic_pattern_protonated(x) = isotopic_pattern(x; adduct="H+")
 
 """
-    monoisotopicMass(formula::String)
+    monoisotopic_mass(formula::String)
 
 Calculate the monoisotopic mass (most abundant isotopic composition) for a given formula.
 
@@ -537,55 +537,55 @@ Returns only the mass of the lowest-mass isotopologue (all lightest isotopes),
 without calculating the full isotopic distribution or printing output.
 
 # Arguments
-- `formula::String`: Chemical formula (same format as `isotopicPattern`)
+- `formula::String`: Chemical formula (same format as `isotopic_pattern`)
 
 # Returns
 - `Float64`: Monoisotopic mass in atomic mass units (amu)
 
 # Examples
 ```julia
-julia> monoisotopicMass("CH3COCH3")
+julia> monoisotopic_mass("CH3COCH3")
 58.0419
 
-julia> monoisotopicMass("C6H12O6")
+julia> monoisotopic_mass("C6H12O6")
 180.0634
 
-julia> monoisotopicMass("[13C]H3COCH3")
+julia> monoisotopic_mass("[13C]H3COCH3")
 59.0452  # One carbon is ¹³C instead of ¹²C
 ```
 
 # Notes
 - This is computationally efficient as it only extracts the first mass peak
 - Uses natural isotopic abundances from NIST database
-- For charged species, use the `adduct` parameter in `isotopicPattern` instead
+- For charged species, use the `adduct` parameter in `isotopic_pattern` instead
 
-See also: [`isotopicPattern`](@ref), [`monoisotopicMassProtonated`](@ref)
+See also: [`isotopic_pattern`](@ref), [`monoisotopic_mass_protonated`](@ref)
 """
-monoisotopicMass(x) = isotopicPattern(x;print=false)[1][1]
+monoisotopic_mass(x) = isotopic_pattern(x;print=false)[1][1]
 
 """
-    monoisotopicMassProtonated(formula::String)
+    monoisotopic_mass_protonated(formula::String)
 
 Calculate the monoisotopic mass of a protonated molecule [M+H]⁺.
 
-Equivalent to calling `isotopicPattern(formula; adduct="H+", print=false)[1][1]`.
+Equivalent to calling `isotopic_pattern(formula; adduct="H+", print=false)[1][1]`.
 Useful for mass spectrometry applications where positive-mode ESI is common.
 
 # Arguments
-- `formula::String`: Chemical formula (same format as `isotopicPattern`)
+- `formula::String`: Chemical formula (same format as `isotopic_pattern`)
 
 # Returns
 - `Float64`: Monoisotopic m/z value for [M+H]⁺ in atomic mass units
 
 # Examples
 ```julia
-julia> monoisotopicMassProtonated("C3H6O")
+julia> monoisotopic_mass_protonated("C3H6O")
 59.049141  # Acetone + proton
 
-julia> monoisotopicMassProtonated("C6H12O6")
+julia> monoisotopic_mass_protonated("C6H12O6")
 181.070646  # Glucose + proton
 ```
 
-See also: [`monoisotopicMass`](@ref), [`isotopicPatternProtonated`](@ref)
+See also: [`monoisotopic_mass`](@ref), [`isotopic_pattern_protonated`](@ref)
 """
-monoisotopicMassProtonated(x) = isotopicPattern(x; adduct="H+", print=false)[1][1]
+monoisotopic_mass_protonated(x) = isotopic_pattern(x; adduct="H+", print=false)[1][1]

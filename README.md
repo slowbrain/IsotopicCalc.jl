@@ -35,7 +35,7 @@ C3D6O           # another notation for fully deuterated acetone
 #### Examples
 Main pupose of this package is to give isotopic pattern distribution for any chemical formula in following fashion:
 ```julia
-julia> isotopicPattern("CH3CHOCH3");
+julia> isotopic_pattern("CH3CHOCH3");
 
 Formula:  C3H6O
 ----------------------------
@@ -66,7 +66,7 @@ Actual output of the function is a `Vector{Tuple{Float64,Float64}}` that contain
 
 The function has several keyword arguments used to customize the output. By default it has cut-off abundance set for 1e-5 as is always shown on function printout. The other keyword arguments include resolution (default value 10000) and possible adduct to the molecule (default set to "").
 ```julia
-isotopicPattern(formula::String; 
+isotopic_pattern(formula::String; 
                 abundance_cutoff=1e-5, 
                 R=4000, 
                 adduct::String="", 
@@ -75,7 +75,7 @@ isotopicPattern(formula::String;
 ```
 It's rather self explaining in following examples:
 ```julia
-julia> isotopicPattern("CH3COCH3"; adduct = "Na+");
+julia> isotopic_pattern("CH3COCH3"; adduct = "Na+");
 
 Formula:  C3H6O.Na+
 ----------------------------
@@ -91,7 +91,7 @@ Mass [amu]     Abundance [%]
 84.0387        0.0067
 Found 8 isotopic masses for 1.0e-5 abundance limit.
 
-julia> isotopicPattern("CH3COCH3"; abundance_cutoff = 1e-8);
+julia> isotopic_pattern("CH3COCH3"; abundance_cutoff = 1e-8);
 
 Formula:  C3H6O
 ----------------------------
@@ -116,7 +116,7 @@ Mass [amu]     Abundance [%]
 62.0557        0.0000046
 Found 17 isotopic masses for 1.0e-8 abundance limit.
 
-julia> isotopicPattern("CH3COCH3"; R=4000);
+julia> isotopic_pattern("CH3COCH3"; R=4000);
 
 Formula:  C3H6O
 ----------------------------
@@ -131,54 +131,45 @@ Mass [amu]     Abundance [%]
 61.049         0.0067
 Found 7 isotopic masses for 1.0e-5 abundance limit.
 ```
-There are one special case implemented. Adduct `H⁺` is called inherently by `isotopicPatternProtonated`. 
+There are one special case implemented. Adduct `H⁺` is called inherently by `isotopic_patternProtonated`. 
 
 
 ### Monotisotopic mass calculation
-For calculation of mono-istopic mass there is also `monoisotopicMass` and `monoisotopicMassProtonated`.
+For calculation of mono-istopic mass there is also `monoisotopic_mass` and `monoisotopic_massProtonated`.
 ```julia
-julia> monoisotopicMass("CH3COCH3")
+julia> monoisotopic_mass("CH3COCH3")
 58.0419
 ```
 
 ### Finding formulas
 Rudimentary determination of compound sum formula from monoisotopic mass is implemented too.
 ```julia
-julia> findFormula(58.0419);
+julia> find_formula(58.0419);
 Matching formulas:
  C3H6O  m/z: 58.041865  ppm: 0.61
  ```
 
-The function has several keyword arguments used to customize the output. 
+The function has several keyword arguments used to customize the output.
 ```julia
-findFormula(mz_input::Float64;
+find_formula(mz_input::Float64;
             atom_pool::Dict{String, Int}=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10),
             tolerance_ppm::Number=100,
-            adduct::String="",
-            charge::Int=0
+            adduct::String=""
            )
 ```
- By default algorithm searches within an interval of 100 ppm around monoisotopic mass and takes into consideration C, H, O, N to be possible building atoms. The associated numbers mean maximum amount of respective atoms to be considered.
-So far adducts can be one of following `M+H`, `M+Na`, `M+K`, `M-H` and charge is to be expressed separately as in example.
+By default algorithm searches within an interval of 100 ppm around monoisotopic mass and takes into consideration C, H, O, N to be possible building atoms. The associated numbers mean maximum amount of respective atoms to be considered.
+
+Supported adducts include `H+`, `Na+`, `K+`, `H-`, or `""` for neutral molecules. The adduct string now contains both the mass change and charge information, making the API cleaner and more intuitive.
 
 ```julia
-julia> findFormula(46.000; tolerance_ppm=2000, charge=1);
-Matching formulas:
- CH2O2+ m/z: 46.004931  ppm: -107.18
- NO2+   m/z: 45.992355  ppm: 166.23
- N2H2O+ m/z: 46.016164  ppm: -351.27
- CNH4O+ m/z: 46.02874   ppm: -624.4
- N3H4+  m/z: 46.039974  ppm: -868.24
- C2H6O+ m/z: 46.041316  ppm: -897.37
- CN2H6+ m/z: 46.05255   ppm: -1141.08
- C2NH8+ m/z: 46.065126  ppm: -1413.78
- C3H10+ m/z: 46.077702  ppm: -1686.32
-
-
-julia> findFormula(59.0491; adduct="M+H", charge=1);
+julia> find_formula(59.0491; adduct="H+");
 Matching formulas:
  C3H6O  [M+H]+  m/z: 59.049141  ppm: -0.7
  CN3H4  [M+H]+  m/z: 59.047799  ppm: 22.04
+
+julia> find_formula(81.0284; adduct="Na+");
+Matching formulas:
+ C3H6O  [M+Na]+  m/z: 81.028084  ppm: 3.9
 ```
 
 
