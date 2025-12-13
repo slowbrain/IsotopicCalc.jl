@@ -13,6 +13,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Example: `find_formula(45.0; adduct="H+", tolerance_ppm=15000)` now finds CO2 (m/z 44.998, ~52 ppm)
   - Maintains upper bound filtering (H ≤ 2×C+2+N) to prevent unrealistic formulas
   - Added regression tests to prevent future issues with low H/C ratio compounds
+## [0.6.1] - 2025-12-13
+
+### Added
+- **Extended chemical heuristics** for formula finding:
+  - Nitrogen Rule (parity check): Enforces nitrogen count parity based on nominal mass
+  - S/C ratio check: Limits sulfur to S ≤ C for organic compounds
+  - P/C ratio check: Limits phosphorus to P ≤ 2×C for organic compounds
+  - Halogen/C ratio check: Limits total halogens (F+Cl+Br+I) ≤ 2×C
+
+### Changed
+- **Improved hydrogen ratio heuristic**: Modified H/C lower bound rule to allow hydrogen-free molecules (e.g., CO2, CO)
+  - Rule now only enforces H ≥ 0.5×C when H > 0
+  - Fixes issue where valid hydrogen-free molecules were incorrectly filtered out
+
+### Performance
+- Enhanced search space pruning with additional heuristics
+- Reduces false positives in formula finding, especially for compounds containing S, P, or halogens
 
 ## [0.6.0] - 2025-12-13
 
