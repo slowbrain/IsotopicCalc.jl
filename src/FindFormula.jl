@@ -218,7 +218,12 @@ end
 Generate all possible molecular formulas within the atom pool constraints.
 
 Uses combinatorial search with chemical heuristics to enumerate formulas.
-Currently applies H ≥ 0.5×C rule to reduce search space.
+Applies multiple chemical rules to reduce search space:
+- Hydrogen/Carbon ratios (H ≥ 0.5×C when H>0, H ≤ 2C+2+N)
+- Heteroatom/Carbon ratios (O ≤ 3C, N ≤ 4C, S ≤ C, P ≤ 2C)
+- Halogen/Carbon ratio ((F+Cl+Br+I) ≤ 2C)
+- Nitrogen Rule (parity check based on nominal mass)
+- DBE (Double Bond Equivalents) ≥ 0
 
 # Arguments
 - `mz_input::Real`: Target m/z value
@@ -235,20 +240,36 @@ function generate_formulas(mz_input::Real, atom_pool::Dict{String, Int}, adduct_
     
     function generate_combinations(elements, counts, idx, current)
         if idx > length(elements)
-            # Extract the counts of C, H, N, and O from 'current'
+            # Extract the counts of C, H, N, O, S, P, and halogens from 'current'
             c_idx = findfirst(isequal("C"), elements)
             h_idx = findfirst(isequal("H"), elements)
             n_idx = findfirst(isequal("N"), elements)
             o_idx = findfirst(isequal("O"), elements)
+            s_idx = findfirst(isequal("S"), elements)
+            p_idx = findfirst(isequal("P"), elements)
+            f_idx = findfirst(isequal("F"), elements)
+            cl_idx = findfirst(isequal("Cl"), elements)
+            br_idx = findfirst(isequal("Br"), elements)
+            i_idx = findfirst(isequal("I"), elements)
 
             C = isnothing(c_idx) ? 0 : current[c_idx]
             H = isnothing(h_idx) ? 0 : current[h_idx]
             N = isnothing(n_idx) ? 0 : current[n_idx]
             O = isnothing(o_idx) ? 0 : current[o_idx]
+            S = isnothing(s_idx) ? 0 : current[s_idx]
+            P = isnothing(p_idx) ? 0 : current[p_idx]
+            F = isnothing(f_idx) ? 0 : current[f_idx]
+            Cl = isnothing(cl_idx) ? 0 : current[cl_idx]
+            Br = isnothing(br_idx) ? 0 : current[br_idx]
+            I = isnothing(i_idx) ? 0 : current[i_idx]
 
             # Apply chemical heuristic rules to prune invalid formulas
-            # Rule 1: Hydrogen ratio - H should be at least 0.5*C but not more than 2*C+2+N
-            if C > 0 && (H < 0.5 * C || H > 2 * C + 2 + N)
+            # Rule 1: Hydrogen ratio - H should not exceed 2*C+2+N
+            # Only apply lower bound if H > 0 (allow H-free molecules like CO2)
+            if C > 0 && H > 0 && H < 0.5 * C
+                return
+            end
+            if C > 0 && H > 2 * C + 2 + N
                 return
             end
 
@@ -266,6 +287,41 @@ function generate_formulas(mz_input::Real, atom_pool::Dict{String, Int}, adduct_
             # DBE = (2C + 2 + N - H) / 2
             # For this to be valid: 2C + 2 + N >= H
             if 2 * C + 2 + N < H
+                return
+            end
+
+            # Rule 5: Nitrogen Rule (parity rule)
+            # Calculate nominal mass to check nitrogen parity
+            nominal_mass = 0
+            for i in eachindex(elements)
+                if current[i] > 0
+                    element_mass = ELEMENTS[elements[i]]["Relative Atomic Mass"][1]
+                    nominal_mass += current[i] * round(Int, element_mass)
+                end
+            end
+            # Add adduct mass contribution to nominal mass
+            nominal_mass += round(Int, adduct_mass)
+            # Subtract electron mass contribution from charge
+            nominal_mass -= charge * round(Int, 0.0005485)
+
+            # For even nominal mass, N should be even; for odd nominal mass, N should be odd
+            if (nominal_mass % 2 == 0 && N % 2 != 0) || (nominal_mass % 2 != 0 && N % 2 == 0)
+                return
+            end
+
+            # Rule 6: S/C ratio - typically S <= C for organic compounds
+            if C > 0 && S > C
+                return
+            end
+
+            # Rule 7: P/C ratio - typically P <= 2*C for organic compounds
+            if C > 0 && P > 2 * C
+                return
+            end
+
+            # Rule 8: Halogen/C ratio - typically (F + Cl + Br + I) <= 2*C
+            total_halogens = F + Cl + Br + I
+            if C > 0 && total_halogens > 2 * C
                 return
             end
 
