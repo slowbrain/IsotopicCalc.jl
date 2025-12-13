@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-12-13
+
+### Added
+
+#### Flexible Adduct System
+- **Dynamic adduct parsing**: Replace hardcoded adduct dictionary with flexible `parse_adduct()` function
+- **Support for all periodic table elements**: Use any element (H, Na, K, Ca, Mg, Li, Br, Cl, etc.) in adduct notation
+- **Flexible notation format**: `[n]Element+/-[m]` where n=atom count, m=charge (both optional)
+- **Examples**: `"H+"`, `"Na+"`, `"Ca+"`, `"Mg+"`, `"Li+"`, `"Br-"`, `"Cl-"`
+
+#### Multiple Charge Support
+- **Multiply charged ions**: Support for ESI-MS and peptide analysis with multiple charges
+- **Notation**: `"2H+2"` (doubly protonated), `"3H+3"` (triply charged), etc.
+- **Radical ions**: `"+2"`, `"+3"`, `"-2"`, etc. for multiply charged radical ions
+- **Proper display formatting**: Shows `[M+2H]2+`, `[M]3+`, `[M+3H]3+`, etc.
+- **Distinction**: Clear difference between `"2H+"` (2 protons, charge +1) and `"2H+2"` (2 protons, charge +2)
+
+#### Type Flexibility
+- **Integer support**: Changed `mz_input` parameter from `Float64` to `Real`
+- **Improved UX**: Accept both integers (e.g., `33`) and floats (e.g., `33.0`)
+
+### Changed
+- Backward compatible: `get_adduct_info()` function now wraps `parse_adduct()`
+- Enhanced documentation with comprehensive examples for new adduct notation
+- Updated README with flexible adduct system description
+
+### Examples
+```julia
+# New flexible adduct support
+find_formula(60.0; adduct="Ca+")      # Calcium adduct
+find_formula(65.0; adduct="Li+")      # Lithium adduct
+find_formula(94.0; adduct="Cl-")      # Chloride loss
+
+# Multiple charge support
+find_formula(30.0; adduct="2H+2")     # Doubly protonated
+find_formula(20.0; adduct="3H+3")     # Triply protonated
+find_formula(29.0; adduct="+2")       # Radical dication
+
+# Integer input
+find_formula(33; adduct="H+")         # Works with integers
+```
+
 ## [0.5.0] - 2025-12-13
 
 ### Breaking Changes
