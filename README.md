@@ -151,7 +151,7 @@ Matching formulas:
 
 The function has several keyword arguments used to customize the output.
 ```julia
-find_formula(mz_input::Float64;
+find_formula(mz_input::Real;
             atom_pool::Dict{String, Int}=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10),
             tolerance_ppm::Number=100,
             adduct::String=""
@@ -159,7 +159,12 @@ find_formula(mz_input::Float64;
 ```
 By default algorithm searches within an interval of 100 ppm around monoisotopic mass and takes into consideration C, H, O, N to be possible building atoms. The associated numbers mean maximum amount of respective atoms to be considered.
 
-Supported adducts include `H+`, `Na+`, `K+`, `H-`, or `""` for neutral molecules. The adduct string now contains both the mass change and charge information, making the API cleaner and more intuitive.
+The adduct parameter supports flexible notation using any element from the periodic table:
+- Format: `[n]Element+/-[m]` where n is optional atom count, m is optional charge
+- Any element is supported (e.g., `"Ca+"`, `"Mg+"`, `"Br-"`, `"Li+"`)
+- Multiple charges supported for multiply charged ions (e.g., `"2H+2"`, `"3H+3"`)
+- Special forms: `"+n"` (radical cation), `"-n"` (radical anion), `""` (neutral)
+- Examples: `"H+"` (singly charged), `"2H+2"` (doubly charged), `"+2"` (radical dication)
 
 ```julia
 julia> find_formula(59.0491; adduct="H+");
