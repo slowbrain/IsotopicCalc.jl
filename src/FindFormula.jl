@@ -288,7 +288,8 @@ function generate_formulas(mz_input::Real, atom_pool::Dict{String, Int}, adduct_
             end
 
             # Rule 5: Nitrogen Rule (parity rule)
-            # Calculate nominal mass to check nitrogen parity
+            # Calculate nominal mass of the NEUTRAL molecule (before adduct)
+            # The nitrogen rule applies to neutral molecules only
             nominal_mass = 0
             for i in eachindex(elements)
                 if current[i] > 0
@@ -296,10 +297,6 @@ function generate_formulas(mz_input::Real, atom_pool::Dict{String, Int}, adduct_
                     nominal_mass += current[i] * round(Int, element_mass)
                 end
             end
-            # Add adduct mass contribution to nominal mass
-            nominal_mass += round(Int, adduct_mass)
-            # Subtract electron mass contribution from charge
-            nominal_mass -= charge * round(Int, 0.0005485)
 
             # For even nominal mass, N should be even; for odd nominal mass, N should be odd
             if (nominal_mass % 2 == 0 && N % 2 != 0) || (nominal_mass % 2 != 0 && N % 2 == 0)
