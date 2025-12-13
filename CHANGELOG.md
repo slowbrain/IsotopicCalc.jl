@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.5.1] - 2025-12-13
+## [0.5.0] - 2025-12-13
 
 ### Breaking Changes
 
@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### 1. Function Naming Convention Changes
 All exported functions now follow Julia best practices with lowercase and underscores:
 
-| Old Name (v0.3.0) | New Name (v0.5.1) |
+| Old Name (v0.3.0) | New Name (v0.5.0) |
 |-------------------|-------------------|
 | `isotopicPattern` | `isotopic_pattern` |
 | `monoisotopicMass` | `monoisotopic_mass` |
@@ -30,7 +30,7 @@ mass = monoisotopicMass("C3H6O")
 pattern = isotopicPattern("C3H6O")
 results = findFormula(58.0419)
 
-# New code (v0.5.1)
+# New code (v0.5.0)
 mass = monoisotopic_mass("C3H6O")
 pattern = isotopic_pattern("C3H6O")
 results = find_formula(58.0419)
@@ -45,7 +45,7 @@ results = find_formula(58.0419)
 # Old code (v0.3.0)
 find_formula(59.0491; adduct="M+H", charge=1)  # No longer works
 
-# New code (v0.5.1)
+# New code (v0.5.0)
 find_formula(59.0491; adduct="H+")  # Required format
 ```
 
