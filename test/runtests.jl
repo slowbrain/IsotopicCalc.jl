@@ -188,12 +188,11 @@ using Test
 
         # Verify CO2 mass accuracy
         co2_idx = findfirst(c -> c.formula == "CO2", results)
-        if !isnothing(co2_idx)
-            co2_compound = results[co2_idx]
-            @test abs(co2_compound.ppm) <= 15000
-            @test co2_compound.charge == 1
-            @test co2_compound.adduct == "M+H"
-        end
+        @test !isnothing(co2_idx)  # Ensure CO2 is found (regression test)
+        co2_compound = results[co2_idx]
+        @test abs(co2_compound.ppm) <= 15000
+        @test co2_compound.charge == 1
+        @test co2_compound.adduct == "M+H"
     end
 
     @testset "Compound Structure" begin
