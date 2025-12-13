@@ -265,10 +265,7 @@ function generate_formulas(mz_input::Real, atom_pool::Dict{String, Int}, adduct_
 
             # Apply chemical heuristic rules to prune invalid formulas
             # Rule 1: Hydrogen ratio - H should not exceed 2*C+2+N
-            # Only apply lower bound if H > 0 (allow H-free molecules like CO2)
-            if C > 0 && H > 0 && H < 0.5 * C
-                return
-            end
+            # Note: We allow H=0 for compounds with no hydrogen
             if C > 0 && H > 2 * C + 2 + N
                 return
             end
