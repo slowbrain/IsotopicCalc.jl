@@ -1,6 +1,6 @@
 name = "IsotopicCalc"
 uuid = "5554e927-0bdd-4e37-b621-d0b49d571e7b"
-version = "0.6.0"
+version = "0.6.2"
 authors = ["Tomas Mikoviny <tomasmi@uio.no> and contributors"]
 
 [deps]

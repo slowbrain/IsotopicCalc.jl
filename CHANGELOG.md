@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.2] - 2025-12-13
+
+### Fixed
+- **Formula finding for low H/C ratio compounds**: Removed overly restrictive hydrogen ratio requirement (H ≥ 0.5×C) from chemical heuristic rules
+  - `find_formula` now correctly identifies CO2, CO, and other low H/C ratio compounds
+  - Example: `find_formula(45.0; adduct="H+", tolerance_ppm=15000)` now finds CO2 (m/z 44.998, ~52 ppm)
+  - Maintains upper bound filtering (H ≤ 2×C+2+N) to prevent unrealistic formulas
+  - Added regression tests to prevent future issues with low H/C ratio compounds
+
 ## [0.6.0] - 2025-12-13
 
 ### Added

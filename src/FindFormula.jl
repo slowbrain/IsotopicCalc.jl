@@ -247,8 +247,9 @@ function generate_formulas(mz_input::Real, atom_pool::Dict{String, Int}, adduct_
             O = isnothing(o_idx) ? 0 : current[o_idx]
 
             # Apply chemical heuristic rules to prune invalid formulas
-            # Rule 1: Hydrogen ratio - H should be at least 0.5*C but not more than 2*C+2+N
-            if C > 0 && (H < 0.5 * C || H > 2 * C + 2 + N)
+            # Rule 1: Hydrogen ratio - H should not exceed 2*C+2+N
+            # Note: We allow H=0 for compounds like CO2, CO
+            if C > 0 && H > 2 * C + 2 + N
                 return
             end
 

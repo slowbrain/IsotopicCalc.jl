@@ -174,6 +174,28 @@ using Test
         @test length(strict) <= length(loose)
     end
 
+    @testset "find_formula - Low H/C Ratio Compounds" begin
+        # Regression test for CO2, CO and other low H/C ratio compounds
+        # Previously, the H >= 0.5*C heuristic rule was too restrictive
+
+        # Test CO2 detection at m/z 45.0 with H+ adduct
+        # CO2 mass = 43.989829, [M+H]+ = 44.997654, ppm from 45.0 = ~52 ppm
+        results = find_formula(45.0; adduct="H+", tolerance_ppm=15000)
+        formulas = [c.formula for c in results]
+
+        @test "CO2" in formulas
+        @test "C2H4O" in formulas
+
+        # Verify CO2 mass accuracy
+        co2_idx = findfirst(c -> c.formula == "CO2", results)
+        if !isnothing(co2_idx)
+            co2_compound = results[co2_idx]
+            @test abs(co2_compound.ppm) <= 15000
+            @test co2_compound.charge == 1
+            @test co2_compound.adduct == "M+H"
+        end
+    end
+
     @testset "Compound Structure" begin
         # Test Compound struct creation and fields
         comp = Compound("C3H6O", "M+H", 1, 59.049141, -0.7)
