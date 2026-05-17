@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.3] - 2026-05-18
+
+### Fixed
+- **Consistent adduct handling in isotopic patterns**:
+  - `isotopic_pattern` now supports deprotonation/loss adducts such as `"H-"` using the same mass semantics as `find_formula`
+  - Radical and multiply charged adducts such as `"+2"` and `"2H+2"` now return m/z values instead of throwing internal `BoundsError`s
+  - Electron mass correction and charge-state division are applied consistently for charged isotopic patterns
+- **Formula finding for multiply charged ions**:
+  - `find_formula` now estimates atom-count search bounds from the neutral mass implied by m/z, charge, and adduct mass
+  - Valid multiply charged results are no longer pruned when the neutral molecule is heavier than the observed m/z
+- **Formula and adduct validation**:
+  - Invalid formula syntax such as leading atom counts (`"2H"`), zero-count atoms (`"H0"`), empty isotope brackets (`"[]"`), and zero-count groups (`"(H)0"`) now raise `ArgumentError`
+  - Zero-charge adducts such as `"+0"` now raise `ArgumentError`
+
+### Tests
+- Added regression tests for deprotonation, multiply charged isotope patterns, multiply charged formula search bounds, and malformed formula/adduct inputs.
+
 ## [0.6.2] - 2025-12-13
 
 ### Fixed

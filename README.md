@@ -11,7 +11,7 @@ To install run one of the following commands:
 ```
 or
 ```julia
-using Pkg; Pkg.add("IsotopicCalc.jl")
+using Pkg; Pkg.add("IsotopicCalc")
 ```
 
 ### Isotopic pattern distribution
@@ -131,11 +131,11 @@ Mass [amu]     Abundance [%]
 61.049         0.0067
 Found 7 isotopic masses for 1.0e-5 abundance limit.
 ```
-There are one special case implemented. Adduct `H⁺` is called inherently by `isotopic_patternProtonated`. 
+The `adduct` parameter supports the same flexible notation as `find_formula`: `"H+"`, `"Na+"`, `"H-"`, `"+2"`, `"2H+2"`, and other `[n]Element+/-[m]` forms. Adduct `H+` is also available through `isotopic_pattern_protonated`.
 
 
 ### Monotisotopic mass calculation
-For calculation of mono-istopic mass there is also `monoisotopic_mass` and `monoisotopic_massProtonated`.
+For calculation of monoisotopic mass there is also `monoisotopic_mass` and `monoisotopic_mass_protonated`.
 ```julia
 julia> monoisotopic_mass("CH3COCH3")
 58.0419
@@ -175,6 +175,10 @@ Matching formulas:
 julia> find_formula(81.0284; adduct="Na+");
 Matching formulas:
  C3H6O  [M+Na]+  m/z: 81.028084  ppm: 3.9
+
+julia> find_formula(72.0933; adduct="2H+2", atom_pool=Dict("C"=>12, "H"=>30));
+Matching formulas:
+ C10H22  [M+2H]2+  m/z: 72.093352  ppm: -0.72
 ```
 
 
@@ -183,4 +187,3 @@ See [`CITATION.bib`](CITATION.bib) for the relevant reference(s).
 
 ### References
 Coursey, J.S., Schwab, D.J., Tsai, J.J., and Dragoset, R.A. (2015), Atomic Weights and Isotopic Compositions (version 4.1). [Online] Available: http://physics.nist.gov/Comp [2023, 08, 22]. National Institute of Standards and Technology, Gaithersburg, MD.
-

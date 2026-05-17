@@ -11,8 +11,11 @@ end
 
 # Pre-compiled regex patterns for better performance
 const FORMULA_VALIDATION_REGEX = r"^[A-Za-z\[\]\d\(\)]+$"
-const CHARGE_PATTERN_REGEX = r"\((\d+)([+-])\)"
-const CHARGE_REMOVAL_REGEX = r"\(\d+[+-]\)"
+
+struct PatternAdductInfo
+    formula_delta::Dict{String, Int}
+    charge::Int
+end
 
 # Parse the molecular formula
 """
@@ -63,6 +66,9 @@ function expand_round_brackets(formula::String)
             end
 
             subformula = formula[i+1:j-1]
+            if isempty(subformula)
+                throw(ArgumentError("Empty parentheses group in formula '$formula'."))
+            end
             i = j + 1
             multiplier = ""
 
@@ -72,6 +78,9 @@ function expand_round_brackets(formula::String)
             end
 
             multiplier = isempty(multiplier) ? 1 : parse(Int, multiplier)
+            if multiplier == 0
+                throw(ArgumentError("Formula groups cannot have a zero multiplier in '$formula'."))
+            end
             expanded_subformula = expand_round_brackets(subformula)  # recursively expand
             expanded_formula *= repeat(expanded_subformula, multiplier)
         else
@@ -102,6 +111,9 @@ function extract_square_brackets(formula::String)
             end
 
             element_inside_brackets = formula[start_idx+1:i-1]
+            if isempty(element_inside_brackets)
+                throw(ArgumentError("Empty square brackets in formula '$formula'. Use bracket notation like [13C] or [2H]."))
+            end
             i += 1  # Move past the closing ']'
             
             # Check for a following multiplier
@@ -114,6 +126,9 @@ function extract_square_brackets(formula::String)
             
             if start_digit != i
                 multiplier = parse(Int, formula[start_digit:i-1])
+            end
+            if multiplier == 0
+                throw(ArgumentError("Isotope '$element_inside_brackets' cannot have a zero count in formula '$formula'."))
             end
             
             extracted[element_inside_brackets] = get(extracted, element_inside_brackets, 0) + multiplier
@@ -140,13 +155,22 @@ function parse_formula_without_isotopes(remaining_formula::String)
             end
             current_element = string(c)
         elseif islowercase(c)
+            if current_element == ""
+                throw(ArgumentError("Invalid element syntax in formula '$remaining_formula': lowercase '$c' cannot start an element symbol."))
+            end
             current_element *= c
         elseif isdigit(c)
+            if current_element == ""
+                throw(ArgumentError("Invalid formula '$remaining_formula': atom counts must follow an element or isotope."))
+            end
             start_idx = i
             while i <= len && isdigit(remaining_formula[i])
                 i += 1
             end
             multiplier = parse(Int, remaining_formula[start_idx:i-1])
+            if multiplier == 0
+                throw(ArgumentError("Element '$current_element' cannot have a zero count in formula '$remaining_formula'."))
+            end
             parsed[current_element] = get(parsed, current_element, 0) + multiplier
             current_element = ""
             continue  # Skip the rest of the loop
@@ -320,29 +344,54 @@ end
 function combine_formulas(base_formula::Dict{String, Int}, adduct_formula::Dict{String, Int})
   combined_formula = deepcopy(base_formula)
   for (atom, count) in adduct_formula
-      combined_formula[atom] = get(combined_formula, atom, 0) + count
+      new_count = get(combined_formula, atom, 0) + count
+      if new_count < 0
+          throw(ArgumentError("Adduct removes more '$atom' atoms than are present in the formula."))
+      elseif new_count == 0
+          delete!(combined_formula, atom)
+      else
+          combined_formula[atom] = new_count
+      end
   end
   return combined_formula
 end
 
-function extract_charge(adduct::String)
-  # Special case for single "+" or "-"
-  if adduct == "+" return -1 end
-  if adduct == "-" return 1 end
-
-  # Handle other formats with regex
-  if occursin(CHARGE_PATTERN_REGEX, adduct)
-      match_data = match(CHARGE_PATTERN_REGEX, adduct)
-      charge_num = parse(Int, match_data.captures[1])
-      charge_sign = match_data.captures[2]
-      return charge_sign == "+" ? -charge_num : charge_num  # Return negative for cationic and positive for anionic
-  elseif endswith(adduct, "+")
-      return -1  # cationic
-  elseif endswith(adduct, "-")
-      return 1   # anionic
-  else
-      return 0  # No charge information found
+function parse_pattern_adduct(adduct::String)
+  if isempty(adduct)
+      return PatternAdductInfo(Dict{String, Int}(), 0)
   end
+
+  radical_match = match(r"^([+-])(\d*)$", adduct)
+  if radical_match !== nothing
+      charge_sign, charge_num_str = radical_match.captures
+      charge_magnitude = isempty(charge_num_str) ? 1 : parse(Int, charge_num_str)
+      if charge_magnitude == 0
+          throw(ArgumentError("Adduct '$adduct' must have a non-zero charge count."))
+      end
+      charge = charge_sign == "+" ? charge_magnitude : -charge_magnitude
+      return PatternAdductInfo(Dict{String, Int}(), charge)
+  end
+
+  adduct_match = match(r"^(\d*)([A-Z][a-z]?)([+-])(\d*)$", adduct)
+  if adduct_match === nothing
+      throw(ArgumentError("Invalid adduct format '$adduct'. Expected [n]Element+/-[m] (e.g. 'H+', '2H+2', 'Cl-') or '+n'/'-n'."))
+  end
+
+  atom_count_str, element, charge_sign, charge_count_str = adduct_match.captures
+  atom_count = isempty(atom_count_str) ? 1 : parse(Int, atom_count_str)
+  charge_magnitude = isempty(charge_count_str) ? 1 : parse(Int, charge_count_str)
+  if atom_count == 0 || charge_magnitude == 0
+      throw(ArgumentError("Adduct '$adduct' must have non-zero atom and charge counts."))
+  end
+
+  element = String(element)
+  if !haskey(ELEMENTS, element)
+      throw(ArgumentError("Unknown adduct element '$element'. Check spelling and capitalization."))
+  end
+
+  atom_delta = charge_sign == "+" ? atom_count : -atom_count
+  charge = charge_sign == "+" ? charge_magnitude : -charge_magnitude
+  return PatternAdductInfo(Dict(element => atom_delta), charge)
 end
 
 """
@@ -426,12 +475,11 @@ function isotopic_pattern(formula::String; abundance_cutoff=1e-5, R=10000, adduc
 
   # If an adduct is provided, parse and combine it with the base formula
   if !isempty(adduct)
-      parsed_adduct = parse_formula(replace(adduct, CHARGE_REMOVAL_REGEX => ""))  # Remove charge info for parsing
-      parsed_formula = combine_formulas(parsed_formula, parsed_adduct)
+      adduct_info = parse_pattern_adduct(adduct)
+      parsed_formula = combine_formulas(parsed_formula, adduct_info.formula_delta)
 
       # Extract charge from adduct and adjust electron count
-      charge = extract_charge(adduct)
-      parsed_formula["e"] = get(parsed_formula, "e", 0) + charge
+      parsed_formula["e"] = get(parsed_formula, "e", 0) - adduct_info.charge
   end
 
   # Initial distribution: monoisotopic mass with 100% abundance
@@ -472,6 +520,11 @@ function isotopic_pattern(formula::String; abundance_cutoff=1e-5, R=10000, adduc
   electron_count = get(parsed_formula, "e", 0)
   electron_mass = ELEMENTS["e"]["Relative Atomic Mass"][1]
   final_distribution = [(m + electron_count * electron_mass, a) for (m, a) in final_distribution]
+
+  charge = -electron_count
+  if charge != 0
+      final_distribution = [(m / abs(charge), a) for (m, a) in final_distribution]
+  end
 
   # Group and sum abundances based on the provided mass resolution R
   final_distribution = group_by_resolution(final_distribution, R)

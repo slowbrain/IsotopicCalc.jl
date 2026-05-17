@@ -100,8 +100,17 @@ using Test
         pattern_k = isotopic_pattern("C3H6O"; adduct="K+", print=false)
         @test isapprox(pattern_k[1][1] - base_mass, 38.963706, atol=1e-3)  # Relaxed tolerance due to double rounding
 
-        # Note: The adduct system currently only supports adding atoms, not removing them.
-        # Deprotonation [M-H]- is not supported. "H-" is interpreted as [M+H]- (add H with negative charge).
+        # H- adduct
+        water_mass = monoisotopic_mass("H2O")
+        pattern_h_minus = isotopic_pattern("H2O"; adduct="H-", print=false)
+        @test isapprox(pattern_h_minus[1][1], water_mass - monoisotopic_mass("H") + 0.0005485, atol=1e-3)
+
+        # Multiple-charge adducts should return m/z values
+        pattern_radical_2 = isotopic_pattern("C3H6O"; adduct="+2", print=false)
+        @test isapprox(pattern_radical_2[1][1], (base_mass - 2 * 0.0005485) / 2, atol=1e-3)
+
+        pattern_2h_2 = isotopic_pattern("C3H6O"; adduct="2H+2", print=false)
+        @test isapprox(pattern_2h_2[1][1], (base_mass + 2 * monoisotopic_mass("H") - 2 * 0.0005485) / 2, atol=1e-3)
     end
 
     @testset "isotopic_pattern - Parameters" begin
@@ -164,6 +173,18 @@ using Test
         end
     end
 
+    @testset "find_formula - Multiple-Charge Search Bounds" begin
+        mz_input = (monoisotopic_mass("C10H22") + 2 * monoisotopic_mass("H") - 2 * 0.0005485) / 2
+        results = find_formula(mz_input; adduct="2H+2", tolerance_ppm=5, atom_pool=Dict("C" => 12, "H" => 30))
+
+        @test any(c -> c.formula == "C10H22", results)
+        c10h22_idx = findfirst(c -> c.formula == "C10H22", results)
+        @test !isnothing(c10h22_idx)
+        @test results[c10h22_idx].charge == 2
+        @test results[c10h22_idx].adduct == "M+2H"
+        @test_throws ArgumentError find_formula(mz_input; adduct="+0", atom_pool=Dict("C" => 12, "H" => 30))
+    end
+
     @testset "find_formula - Tolerance Filtering" begin
         mz = 58.0419  # Acetone
 
@@ -216,6 +237,12 @@ using Test
         @test_throws ArgumentError isotopic_pattern("C3H6(O")
         @test_throws ArgumentError isotopic_pattern("C3H6)O")
         @test_throws ArgumentError isotopic_pattern("((CH3)")
+        @test_throws ArgumentError isotopic_pattern("2H")
+        @test_throws ArgumentError isotopic_pattern("H0")
+        @test_throws ArgumentError isotopic_pattern("C0H0")
+        @test_throws ArgumentError isotopic_pattern("[]")
+        @test_throws ArgumentError isotopic_pattern("(H)0")
+        @test_throws ArgumentError isotopic_pattern("H"; adduct="+0")
 
         # Test invalid parameters
         @test_throws ArgumentError isotopic_pattern("C3H6O"; abundance_cutoff=-0.1)

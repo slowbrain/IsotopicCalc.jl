@@ -110,6 +110,9 @@ function parse_adduct(adduct::String)
     if m_radical !== nothing
         charge_sign, charge_num_str = m_radical.captures
         charge_magnitude = charge_num_str == "" ? 1 : parse(Int, charge_num_str)
+        if charge_magnitude == 0
+            throw(ArgumentError("Adduct '$adduct' must have a non-zero charge count."))
+        end
         charge = charge_sign == "+" ? charge_magnitude : -charge_magnitude
         display_name = "M"  # Just "M" for radical ions, charge will be added in output formatting
         return AdductInfo(0.0, charge, display_name)
@@ -130,6 +133,9 @@ function parse_adduct(adduct::String)
 
     # Parse charge count (default to 1 if not specified)
     charge_magnitude = charge_count_str == "" ? 1 : parse(Int, charge_count_str)
+    if atom_count == 0 || charge_magnitude == 0
+        throw(ArgumentError("Adduct '$adduct' must have non-zero atom and charge counts."))
+    end
 
     # Convert SubString to String for JSON.Object compatibility
     element = String(element)
@@ -339,9 +345,19 @@ function generate_formulas(mz_input::Real, atom_pool::Dict{String, Int}, adduct_
     elements = collect(keys(atom_pool))
     n_elements = length(elements)
     max_counts = Vector{Int}(undef, n_elements)
+    neutral_mass_limit = charge == 0 ? mz_input - adduct_mass : abs(charge) * mz_input - adduct_mass + charge * 0.0005485
+    if neutral_mass_limit <= 0
+        return formulas
+    end
     for i in 1:n_elements
         elem = elements[i]
-        max_counts[i] = min(atom_pool[elem], round(Int, mz_input / ELEMENTS[elem]["Relative Atomic Mass"][1]))
+        if atom_pool[elem] < 0
+            throw(ArgumentError("atom_pool counts must be non-negative (got $(atom_pool[elem]) for '$elem')."))
+        end
+        if !haskey(ELEMENTS, elem)
+            throw(ArgumentError("Unknown atom_pool element '$elem'. Check spelling and capitalization."))
+        end
+        max_counts[i] = min(atom_pool[elem], ceil(Int, neutral_mass_limit / ELEMENTS[elem]["Relative Atomic Mass"][1]))
     end
     generate_combinations(elements, max_counts, 1, zeros(Int, n_elements))
     
