@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.4] - 2026-05-18
+
+### Fixed
+- **Square-bracket isotope validation**:
+  - Stray closing brackets such as `"C]H4"` now raise `ArgumentError` instead of being silently ignored during formula parsing
+  - Nested square brackets and malformed isotope tokens such as `"[[13C]]H4"`, `"[C13]H4"`, `"[13]H4"`, and `"[13c]H4"` are rejected consistently
+  - Non-isotope formula parsing now raises on unexpected leftover syntax rather than skipping unrecognized characters
+
+### Tests
+- Added focused regression tests for malformed square-bracket isotope syntax.
+
 ## [0.6.3] - 2026-05-18
 
 ### Fixed

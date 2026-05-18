@@ -11,6 +11,7 @@ end
 
 # Pre-compiled regex patterns for better performance
 const FORMULA_VALIDATION_REGEX = r"^[A-Za-z\[\]\d\(\)]+$"
+const ISOTOPE_TOKEN_REGEX = r"^\d+[A-Z][a-z]?$"
 
 struct PatternAdductInfo
     formula_delta::Dict{String, Int}
@@ -103,6 +104,9 @@ function extract_square_brackets(formula::String)
         if c == '['  # Start of square bracket
             start_idx = i
             while i <= len && formula[i] != ']'
+                if i > start_idx && formula[i] == '['
+                    throw(ArgumentError("Nested square brackets in formula '$formula' at position $i. Use isotope notation like [13C] or [2H]."))
+                end
                 i += 1
             end
             
@@ -113,6 +117,9 @@ function extract_square_brackets(formula::String)
             element_inside_brackets = formula[start_idx+1:i-1]
             if isempty(element_inside_brackets)
                 throw(ArgumentError("Empty square brackets in formula '$formula'. Use bracket notation like [13C] or [2H]."))
+            end
+            if !occursin(ISOTOPE_TOKEN_REGEX, element_inside_brackets)
+                throw(ArgumentError("Malformed isotope token '[$element_inside_brackets]' in formula '$formula'. Use isotope notation like [13C] or [2H]."))
             end
             i += 1  # Move past the closing ']'
             
@@ -133,6 +140,8 @@ function extract_square_brackets(formula::String)
             
             extracted[element_inside_brackets] = get(extracted, element_inside_brackets, 0) + multiplier
             
+        elseif c == ']'
+            throw(ArgumentError("Stray closing square bracket in formula '$formula' at position $i. Use isotope notation like [13C] or [2H]."))
         else
             remaining_formula *= c
             i += 1
@@ -174,6 +183,8 @@ function parse_formula_without_isotopes(remaining_formula::String)
             parsed[current_element] = get(parsed, current_element, 0) + multiplier
             current_element = ""
             continue  # Skip the rest of the loop
+        else
+            throw(ArgumentError("Invalid formula syntax in '$remaining_formula': unexpected character '$c'."))
         end
         i += 1
     end

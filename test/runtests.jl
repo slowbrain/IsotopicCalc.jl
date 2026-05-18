@@ -241,6 +241,12 @@ using Test
         @test_throws ArgumentError isotopic_pattern("H0")
         @test_throws ArgumentError isotopic_pattern("C0H0")
         @test_throws ArgumentError isotopic_pattern("[]")
+        @test_throws ArgumentError isotopic_pattern("C]H4")
+        @test_throws ArgumentError isotopic_pattern("[13C]]H4")
+        @test_throws ArgumentError isotopic_pattern("[[13C]]H4")
+        @test_throws ArgumentError isotopic_pattern("[C13]H4")
+        @test_throws ArgumentError isotopic_pattern("[13]H4")
+        @test_throws ArgumentError isotopic_pattern("[13c]H4")
         @test_throws ArgumentError isotopic_pattern("(H)0")
         @test_throws ArgumentError isotopic_pattern("H"; adduct="+0")
 
