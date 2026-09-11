@@ -32,7 +32,15 @@ pattern = isotopic_pattern("C3H6O"; ion="[M+H]+", print=false)
 candidates = find_formula(mz;
     ion="[M+H]+", tolerance_ppm=5,
     atom_pool=Dict("C"=>6, "H"=>14, "O"=>3), print=false)
+
+# Hydrogen subtraction: atom removal and charge are independent.
+ion_mass("C3H6O"; ion="[M-H]-") # Remove H, charge -1 (deprotonation)
+ion_mass("C3H6O"; ion="[M-H]+") # Remove H, charge +1
+ion_mass("C3H6O"; ion="[M-H]")  # Remove H, charge 0
 ```
+
+Use the same `ion` specification for mass calculation, isotope prediction, and
+formula search. Omit `ion` for an unchanged neutral molecule.
 
 | Task | API | Return value |
 | --- | --- | --- |
@@ -47,7 +55,7 @@ candidates = find_formula(mz;
 
 See [formula notation](#formula-notation), [ion transformations](#ion-transformations), [isotope labeling](#annotated-results-and-isotope-labeling), [search constraints](#search-constraints-and-diagnostics), and [cluster ranking](#ranking-measured-isotope-clusters) below.
 
-### Compatibility notes
+### Version 0.8 API
 
 Version 0.8.0 uses explicit ion transformations and removes the legacy adduct API. Tuple output from `isotopic_pattern` and candidate-vector output from `find_formula` remain the defaults; annotation and diagnostics are opt-in.
 
@@ -128,6 +136,10 @@ The calculation uses these rules:
 
 ### Ion transformations
 
+An **ion transformation** defines which atoms are added or removed and the
+resulting charge. This covers attachment, hydrogen subtraction, neutral losses,
+and changes to charge alone.
+
 Use the `ion` keyword in `ion_mass`, `isotopic_pattern`, and `find_formula`.
 It accepts full `[M+...-...]z+/-` notation or an `IonSpec`. The signs **inside**
 the brackets add or remove atoms; the suffix **outside** specifies charge.
@@ -151,9 +163,11 @@ Omit the suffix for an uncharged transformation. `M` denotes the input formula.
 | `"[M]-"`, `"[M]2-"` | Add electrons only | −1, −2 |
 
 ```julia
-ion_mass("C3H6O"; ion="[M-H]+")
-isotopic_pattern("C3H6O"; ion="[M-H]-", print=false)
-find_formula(ion_mass("C3H6O"; ion="[M-H]+"); ion="[M-H]+", print=false)
+hydrogen_loss = IonSpec(remove="H", charge=1) # Equivalent to "[M-H]+"
+mz = ion_mass("C3H6O"; ion=hydrogen_loss)
+pattern = isotopic_pattern("C3H6O"; ion=hydrogen_loss, print=false)
+candidates = find_formula(mz; ion=hydrogen_loss, tolerance_ppm=5,
+    atom_pool=Dict("C"=>6, "H"=>14, "O"=>3), print=false)
 
 # The same hydrogen loss with an explicit, independent charge:
 ion_mass("C3H6O"; ion=IonSpec(remove="H", charge=1))
@@ -176,12 +190,27 @@ With `z = 0`, the result is `neutral_mass + atom_mass_change`.
 `ion_mass` calculates this directly using reference principal-isotope masses;
 isotope enrichment does not change those reference masses.
 
-**Breaking API change in 0.8:** `adduct=` and compact strings such as `H+`, `H-`,
-`Cl-`, `2H+2`, `+2`, and the empty string have been removed, with no aliases.
-Use `ion="[M+H]+"`, `ion="[M-H]-"`, or the corresponding full notation.
-For neutral calculations, omit `ion` or use `IonSpec()` / `"[M]"`.
+#### Migrating from the removed adduct API
+
+`adduct=` and compact notation are no longer accepted. Replace older calls as
+follows; these are migration examples, not supported aliases.
+
+| Removed argument | Current argument | Meaning |
+|---|---|---|
+| `adduct="H+"` | `ion="[M+H]+"` | Protonation |
+| `adduct="H-"` | `ion="[M-H]-"` | Deprotonation |
+| `adduct="Na+"` | `ion="[M+Na]+"` | Sodium attachment |
+| `adduct="Cl-"` | `ion="[M-Cl]-"` | Chlorine removal |
+| `adduct="2H+2"` | `ion="[M+2H]2+"` | Two hydrogens added, charge +2 |
+| `adduct="+2"` | `ion="[M]2+"` | Charge +2 without atom changes |
+| `adduct=""` | Omit `ion` or use `ion=IonSpec()` | Unchanged neutral molecule |
+
+For chloride **attachment**, use `ion="[M+Cl]-"`. For hydrogen subtraction with
+positive charge, use `ion="[M-H]+"`.
+
 `Compound.ion` replaces `Compound.adduct` and contains the full notation including
-charge. Diagnostics use `:infeasible_ion`; JSON snapshots use schema version 2.
+charge. `IonSpec` has no stored `name` field; use `string(spec)` for its notation.
+Diagnostics use `:infeasible_ion`; JSON snapshots use schema version 2.
 
 ### Annotated results and isotope labeling
 
