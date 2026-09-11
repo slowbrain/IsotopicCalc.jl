@@ -4,7 +4,7 @@ using Test
 @testset "IsotopicCalc.jl" begin
 
     @testset "monoisotopic_mass - Basic Formulas" begin
-        # Test simple molecules (tolerance accounts for R=10000 resolution rounding)
+        # Rounded reference values are specified to six decimal places.
         @test isapprox(monoisotopic_mass("H2O"), 18.010565, atol=1e-4)
         @test isapprox(monoisotopic_mass("CO2"), 43.989829, atol=1e-4)
         @test isapprox(monoisotopic_mass("CH4"), 16.031300, atol=1e-4)
@@ -59,10 +59,10 @@ using Test
         acetone = monoisotopic_mass("C3H6O")
         acetone_protonated = monoisotopic_mass_protonated("C3H6O")
         @test acetone_protonated > acetone
-        @test isapprox(acetone_protonated - acetone, 1.007825, atol=1e-3)  # Proton mass (relaxed tolerance due to double rounding)
+        @test isapprox(acetone_protonated - acetone, 1.00727653223, atol=1e-12)  # Proton mass from the bundled atom and electron masses.
 
         # Compare with direct isotopic_pattern call
-        pattern_h = isotopic_pattern("C3H6O"; adduct="H+", print=false)
+        pattern_h = isotopic_pattern("C3H6O"; ion="[M+H]+", print=false)
         @test isapprox(monoisotopic_mass_protonated("C3H6O"), pattern_h[1][1], atol=1e-6)
     end
 
@@ -88,28 +88,28 @@ using Test
         # Test with different adducts
         base_mass = monoisotopic_mass("C3H6O")
 
-        # H+ adduct
-        pattern_h = isotopic_pattern("C3H6O"; adduct="H+", print=false)
-        @test isapprox(pattern_h[1][1] - base_mass, 1.007825, atol=1e-3)  # Relaxed tolerance due to double rounding
+        # Protonation: [M+H]+
+        pattern_h = isotopic_pattern("C3H6O"; ion="[M+H]+", print=false)
+        @test isapprox(pattern_h[1][1] - base_mass, 1.00727653223, atol=1e-12)  # Exact ion mass includes electron subtraction.
 
-        # Na+ adduct
-        pattern_na = isotopic_pattern("C3H6O"; adduct="Na+", print=false)
-        @test isapprox(pattern_na[1][1] - base_mass, 22.989769, atol=1e-3)  # Relaxed tolerance due to double rounding
+        # Sodium attachment: [M+Na]+
+        pattern_na = isotopic_pattern("C3H6O"; ion="[M+Na]+", print=false)
+        @test isapprox(pattern_na[1][1] - base_mass, 22.989220782, atol=1e-10)  # Exact ion mass includes electron subtraction.
 
-        # K+ adduct
-        pattern_k = isotopic_pattern("C3H6O"; adduct="K+", print=false)
-        @test isapprox(pattern_k[1][1] - base_mass, 38.963706, atol=1e-3)  # Relaxed tolerance due to double rounding
+        # Potassium attachment: [M+K]+
+        pattern_k = isotopic_pattern("C3H6O"; ion="[M+K]+", print=false)
+        @test isapprox(pattern_k[1][1] - base_mass, 38.9631579864, atol=1e-10)  # Exact ion mass includes electron subtraction.
 
-        # H- adduct
+        # Deprotonation: [M-H]-
         water_mass = monoisotopic_mass("H2O")
-        pattern_h_minus = isotopic_pattern("H2O"; adduct="H-", print=false)
+        pattern_h_minus = isotopic_pattern("H2O"; ion="[M-H]-", print=false)
         @test isapprox(pattern_h_minus[1][1], water_mass - monoisotopic_mass("H") + 0.0005485, atol=1e-3)
 
         # Multiple-charge adducts should return m/z values
-        pattern_radical_2 = isotopic_pattern("C3H6O"; adduct="+2", print=false)
+        pattern_radical_2 = isotopic_pattern("C3H6O"; ion="[M]2+", print=false)
         @test isapprox(pattern_radical_2[1][1], (base_mass - 2 * 0.0005485) / 2, atol=1e-3)
 
-        pattern_2h_2 = isotopic_pattern("C3H6O"; adduct="2H+2", print=false)
+        pattern_2h_2 = isotopic_pattern("C3H6O"; ion="[M+2H]2+", print=false)
         @test isapprox(pattern_2h_2[1][1], (base_mass + 2 * monoisotopic_mass("H") - 2 * 0.0005485) / 2, atol=1e-3)
     end
 
@@ -154,12 +154,12 @@ using Test
     end
 
     @testset "find_formula - With Adducts" begin
-        # Test adduct API with H+ format
+        # Test ion API with full [M+H]+ notation
         mz_input = 33.034
         tolerance = 20.0
         atom_pool = Dict("C" => 5, "H" => 10, "N" => 2, "O" => 3)
 
-        results = find_formula(mz_input, tolerance_ppm=tolerance, atom_pool=atom_pool, adduct="H+")
+        results = find_formula(mz_input, tolerance_ppm=tolerance, atom_pool=atom_pool, ion="[M+H]+")
         @test length(results) >= 1
         @test any(c -> c.formula == "CH4O", results)
 
@@ -167,7 +167,7 @@ using Test
         ch4o = findfirst(c -> c.formula == "CH4O", results)
         if !isnothing(ch4o)
             compound = results[ch4o]
-            @test compound.adduct == "M+H"
+            @test compound.ion == "[M+H]+"
             @test compound.charge == 1
             @test abs(compound.ppm) <= tolerance
         end
@@ -175,14 +175,14 @@ using Test
 
     @testset "find_formula - Multiple-Charge Search Bounds" begin
         mz_input = (monoisotopic_mass("C10H22") + 2 * monoisotopic_mass("H") - 2 * 0.0005485) / 2
-        results = find_formula(mz_input; adduct="2H+2", tolerance_ppm=5, atom_pool=Dict("C" => 12, "H" => 30))
+        results = find_formula(mz_input; ion="[M+2H]2+", tolerance_ppm=5, atom_pool=Dict("C" => 12, "H" => 30))
 
         @test any(c -> c.formula == "C10H22", results)
         c10h22_idx = findfirst(c -> c.formula == "C10H22", results)
         @test !isnothing(c10h22_idx)
         @test results[c10h22_idx].charge == 2
-        @test results[c10h22_idx].adduct == "M+2H"
-        @test_throws ArgumentError find_formula(mz_input; adduct="+0", atom_pool=Dict("C" => 12, "H" => 30))
+        @test results[c10h22_idx].ion == "[M+H2]2+"
+        @test_throws ArgumentError find_formula(mz_input; ion="[M]0+", atom_pool=Dict("C" => 12, "H" => 30))
     end
 
     @testset "find_formula - Tolerance Filtering" begin
@@ -199,9 +199,9 @@ using Test
         # Regression test for CO2 and other low H/C ratio compounds (H=0)
         # Previously, the H >= 0.5*C heuristic rule was too restrictive
 
-        # Test CO2 detection at m/z 45.0 with H+ adduct
+        # Test CO2 detection at m/z 45.0 with protonation
         # CO2 [M+H]+ = ~44.997, ppm from 45.0 = ~64 ppm (after resolution rounding)
-        results = find_formula(45.0; adduct="H+", tolerance_ppm=150)
+        results = find_formula(45.0; ion="[M+H]+", tolerance_ppm=150)
         formulas = [c.formula for c in results]
 
         # Verify CO2 is found (regression test for low H/C ratio bug fix)
@@ -211,15 +211,15 @@ using Test
         co2_compound = results[co2_idx]
         @test abs(co2_compound.ppm) < 70  # Actual error is ~64 ppm
         @test co2_compound.charge == 1
-        @test co2_compound.adduct == "M+H"
+        @test co2_compound.ion == "[M+H]+"
     end
 
     @testset "Compound Structure" begin
         # Test Compound struct creation and fields
-        comp = Compound("C3H6O", "M+H", 1, 59.049141, -0.7)
+        comp = Compound("C3H6O", "[M+H]+", 1, 59.049141, -0.7)
 
         @test comp.formula == "C3H6O"
-        @test comp.adduct == "M+H"
+        @test comp.ion == "[M+H]+"
         @test comp.charge == 1
         @test comp.mz ≈ 59.049141
         @test comp.ppm ≈ -0.7
@@ -248,7 +248,7 @@ using Test
         @test_throws ArgumentError isotopic_pattern("[13]H4")
         @test_throws ArgumentError isotopic_pattern("[13c]H4")
         @test_throws ArgumentError isotopic_pattern("(H)0")
-        @test_throws ArgumentError isotopic_pattern("H"; adduct="+0")
+        @test_throws ArgumentError isotopic_pattern("H"; ion="[M]0+")
 
         # Test invalid parameters
         @test_throws ArgumentError isotopic_pattern("C3H6O"; abundance_cutoff=-0.1)
@@ -284,7 +284,7 @@ using Test
 
     @testset "Edge Cases - Elements with Multiple Digits" begin
         # Test formulas with 2-digit counts
-        # Note: These comparisons involve resolution rounding, so we use relaxed tolerance
+        # Exact masses are additive across atom counts.
         @test isapprox(monoisotopic_mass("C10H22"), monoisotopic_mass("C") * 10 + monoisotopic_mass("H") * 22, atol=1e-3)
         @test isapprox(monoisotopic_mass("C100"), monoisotopic_mass("C") * 100, atol=1e-3)
     end
@@ -314,3 +314,11 @@ using Test
     end
 
 end
+
+include("scientific_regressions.jl")
+
+include("parser_search_api.jl")
+
+include("application_features.jl")
+
+include("ion_transformations.jl")

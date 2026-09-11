@@ -8,7 +8,7 @@ A Julia package for calculating isotopic patterns and monoisotopic masses of che
 - Compute monoisotopic masses for any chemical formula
 - Find molecular formulas from experimental m/z values
 - Support for complex formula notations (parentheses, specific isotopes)
-- Handle various ionization states and adducts (H⁺, Na⁺, K⁺, etc.)
+- Model atom additions, atom losses, and signed charge with explicit ion transformations
 - Uses NIST atomic weights and isotopic composition data
 
 # Main Functions
@@ -18,6 +18,11 @@ A Julia package for calculating isotopic patterns and monoisotopic masses of che
 - [`isotopic_pattern_protonated`](@ref): Convenience function for [M+H]⁺
 - [`monoisotopic_mass_protonated`](@ref): Monoisotopic mass of [M+H]⁺
 - [`Compound`](@ref): Data structure for formula search results
+- [`IonSpec`](@ref), [`ion_mass`](@ref): Explicit ion compositions and direct m/z
+- [`PatternResult`](@ref), [`IsotopePopulation`](@ref): Annotated patterns and labeling mixtures
+- [`SearchConstraints`](@ref), [`SearchResult`](@ref): Constrained searches and diagnostics
+- [`rank_formulas`](@ref): Candidate ranking against observed isotope clusters
+- [`result_dict`](@ref): JSON-safe reproducibility snapshots
 
 # Example Usage
 ```julia
@@ -32,8 +37,8 @@ mass = monoisotopic_mass("C6H12O6")  # Returns 180.0634
 # Find formulas matching an m/z value
 matches = find_formula(58.0419; tolerance_ppm=10)
 
-# Calculate pattern with adduct
-isotopic_pattern("C6H12O6"; adduct="Na+")
+# Calculate the pattern for sodium attachment
+isotopic_pattern("C6H12O6"; ion="[M+Na]+")
 ```
 
 # Formula Notation
@@ -52,7 +57,10 @@ See also: README.md for detailed examples and CITATION.bib for citing this packa
 """
 module IsotopicCalc
 
-    using JSON
+    using JSON, SHA, TOML
+
+    const PACKAGE_VERSION = VersionNumber(TOML.parsefile(joinpath(@__DIR__, "..", "Project.toml"))["version"])
+    const ISOTOPE_DATA_SHA256 = bytes2hex(sha256(read(joinpath(@__DIR__, "elements.json"))))
 
     # Load element data that will be used by submodules
     const ELEMENTS = JSON.parsefile(Base.Filesystem.joinpath(dirname(@__FILE__),"elements.json"));
@@ -63,8 +71,14 @@ module IsotopicCalc
 
     # Import and re-export functions from submodules
     using .IsotopicPatternModule: isotopic_pattern, monoisotopic_mass, isotopic_pattern_protonated, monoisotopic_mass_protonated
-    using .FindFormulaModule: Compound, find_formula
+    using .FindFormulaModule: Compound, find_formula, SearchConstraints, SearchDiagnostics, SearchResult
+    using .IsotopicPatternModule: IonSpec, ion_mass, IsotopePopulation, IsotopeContribution, IsotopePeak, PatternResult
 
+    include("PatternMatching.jl")
+    include("ResultExport.jl")
+    export result_dict
+    export PeakMatch, RankedCandidate, rank_formulas
+    export IonSpec, ion_mass, IsotopePopulation, IsotopeContribution, IsotopePeak, PatternResult, SearchConstraints, SearchDiagnostics, SearchResult
     export isotopic_pattern, monoisotopic_mass, isotopic_pattern_protonated, monoisotopic_mass_protonated, find_formula, Compound
 
 end # module

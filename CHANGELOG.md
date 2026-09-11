@@ -5,6 +5,65 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-09-11
+
+### Changed
+- Use one `ion` keyword accepting an `IonSpec` or full `[M+...-...]z+/-` notation across direct masses, isotope patterns, formula search, and ranking.
+- Define hydrogen subtraction independently of charge: `[M-H]-` (deprotonation), `[M-H]+` (positive ion), and `[M-H]` (uncharged loss). Multiple hydrogen losses use e.g. `[M-2H]2-`.
+- Derive full display notation from `IonSpec.additions`, `.losses`, and `.charge`, removing the redundant name field.
+- Rename `Compound.adduct` to `Compound.ion`, including charge in its notation, and rename `:infeasible_adduct` diagnostics to `:infeasible_ion`.
+- Bump portable result snapshots to schema version 2 for the changed ion/result fields.
+
+### Removed
+- The `adduct` keyword, compact notation (`H+`, `H-`, `Cl-`, `2H+2`, `+2`, and empty strings), and all compatibility aliases. Omit `ion`, use `IonSpec()`, or use `[M]` for neutral calculations.
+- Duplicate adduct-info structures and the `parse_adduct`, `get_adduct_info`, and `parse_pattern_adduct` wrappers; search now consumes `IonSpec` directly.
+
+## [0.7.0] - 2026-09-11
+
+### Added
+- `IonSpec` and `ion_mass`, with multi-element adducts, independent charge/atom changes, full bracket notation, and neutral-precursor versus actual-ion search modes.
+- Optional annotated `PatternResult`/`IsotopePeak` output with isotope contributors, absolute probabilities, cutoff/pruning accounting, and reproducibility metadata.
+- Per-call isotope abundance overrides and weighted `IsotopePopulation` mixtures, without mutating the reference data.
+- `SearchConstraints`, minimum counts, configurable ratio/DBE intervals, absolute mass-tolerance floors, and optional `SearchResult` diagnostics.
+- `rank_formulas` with one-to-one observed/predicted peak matching, separate mass/intensity evidence, fitted intensities, residuals, missing peaks, and unexplained measurements.
+- JSON-safe `result_dict` snapshots and an executable synthetic isotope-assignment example.
+
+### Compatibility
+- Existing tuple pattern results and candidate vectors remain the default.
+- Legacy `H-`/`Cl-` shorthand retains atom-removal semantics; full `[M+Cl]-` notation expresses chloride attachment.
+- Principal-isotope masses remain based on the bundled reference table even when enrichment is supplied for pattern prediction.
+
+## [0.6.6] - 2026-09-11
+
+### Fixed
+- Parse formula tokens in one pass, rejecting malformed boundaries such as `C[13C]l` and `C(H)l`.
+- Preserve isotope brackets in formatted formulas and reject atom-count overflow.
+- Handle radical adducts with empty atom deltas consistently in formula search.
+
+### Performance
+- Accumulate nested group counts directly instead of materializing expanded formula strings.
+- Prune search branches using the neutral-mass interval and remaining atom-count bounds; construct result strings only for matching candidates.
+
+### Added
+- `print=false` and `io` output controls for formula search; `io` for isotope patterns.
+- `AbstractString` formula/adduct inputs, including `SubString`.
+- Keyword forwarding through `isotopic_pattern_protonated` with its hydrogen adduct fixed.
+- Parser round-trip, deep-group, count-overflow, output-routing, and exhaustive search-equivalence regression tests.
+
+## [0.6.5] - 2026-09-10
+
+### Fixed
+- Combine isotope permutations before probability pruning; bound the total omitted absolute probability and apply the relative cutoff after peak grouping and normalization.
+- Calculate unrounded monoisotopic masses directly from principal isotopes, including in formula search and adduct masses.
+- Merge peaks using the documented resolving power and report abundance-weighted centroids. Default acetone output now has four merged peaks rather than eight rounded masses; use `R=Inf` for fine structure.
+- Reject formula-search candidates whose adduct removes unavailable atoms.
+- Include halogens in closed-shell CHNO valence checks; permit CF4 and reject C2H6F2. Avoid applying this restricted model to other element sets.
+- Support cutoff endpoints zero and one; reject nonfinite/out-of-range parameters and handle empty internal distributions.
+
+### Added
+- `heuristics=false` disables empirical organic composition ratios in formula search.
+- Independent binomial/multinomial, exact-mass, centroid, adduct, and boundary regression tests.
+
 ## [0.6.4] - 2026-05-18
 
 ### Fixed
