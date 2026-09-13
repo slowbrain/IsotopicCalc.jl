@@ -108,13 +108,16 @@ Mass [amu]     Abundance [%]
 61.04959386    0.0069737949
 ```
 
-By default, the return value is a `Vector{Tuple{Float64,Float64}}` containing unrounded mass (or m/z) and abundance relative to the strongest peak, whose abundance is `1.0`.
+By default, the return value is a `Vector{Tuple{Float64,Float64}}` containing unrounded mass (or m/z) and abundance relative to the strongest peak, whose abundance is `1.0`. Peaks are ordered by increasing mass; printed abundances are percentages.
 
 ```julia
 pattern = isotopic_pattern("C3H6O";
     abundance_cutoff=1e-5,
     R=10000,
     ion=IonSpec(),
+    annotated=false,
+    abundances=Dict(),
+    mixture=nothing,
     print=false,
     io=stdout,
 )
@@ -133,6 +136,8 @@ The calculation uses these rules:
 - The relative abundance cutoff is applied **after grouping and normalization**. Valid cutoffs are finite numbers in `[0,1]`; zero disables probability pruning, and one retains the strongest peak(s).
 - For a positive cutoff, internal pruning discards at most `min(1e-12, abundance_cutoff*1e-8)` total absolute probability, apart from floating-point roundoff. Zero-cutoff calculations can become expensive for large formulas.
 - Each element's tabulated abundance vector is normalized to sum to one. Explicit isotope labels have probability one.
+
+`R` must be positive; `Inf` is supported, while zero, negative values, and `NaN` are rejected.
 
 ### Ion transformations
 
@@ -211,6 +216,9 @@ positive charge, use `ion="[M-H]+"`.
 `Compound.ion` replaces `Compound.adduct` and contains the full notation including
 charge. `IonSpec` has no stored `name` field; use `string(spec)` for its notation.
 Diagnostics use `:infeasible_ion`; JSON snapshots use schema version 2.
+The old `parse_adduct`, `get_adduct_info`, and `parse_pattern_adduct` helpers and
+adduct-info structures have also been removed. Construct `IonSpec(notation)`
+to parse a transformation and use `ion_mass(formula; ion=spec)` to calculate it.
 
 ### Annotated results and isotope labeling
 
@@ -227,6 +235,20 @@ result.retained_probability          # ≈ 1.0
 With `annotated=true`, the return type is `PatternResult`. Each `IsotopePeak` has `mass`, relative `abundance`, absolute `probability`, and `contributors`. Each contributor records isotope counts, mass/m/z, absolute probability, and its population index. A merged peak's centroid and probability can be reconstructed from its contributors.
 
 The result records retained probability, probability removed by the final cutoff, estimated probability removed by internal pruning, and the pruning bound. These account for the distribution up to floating-point roundoff. Settings include ion composition changes, source-population formulas/weights, abundance overrides, resolving power, cutoff, package version, and a SHA-256 fingerprint of the bundled isotope table. Annotation retains more information and uses more memory than tuple output.
+
+| `PatternResult` field | Meaning |
+| --- | --- |
+| `formula`, `ion_composition`, `charge` | Formatted input formula, transformed base atom counts, and signed charge |
+| `peaks` | Mass-ordered `IsotopePeak` values |
+| `retained_probability` | Sum of the returned peaks' absolute probabilities |
+| `cutoff_probability` | Absolute probability removed by the final relative cutoff |
+| `pruned_probability` | Estimated absolute probability lost to internal pruning |
+| `pruning_bound` | Requested upper bound on internal probability loss |
+| `settings` | Snapshot of calculation inputs and reference-data metadata |
+
+`retained_probability + cutoff_probability + pruned_probability ≈ 1`.
+Contributors are `IsotopeContribution` objects; their `population` field is a
+one-based index into `result.settings.populations`.
 
 Abundance overrides are **per call** and never modify the bundled table. Each element maps isotope labels to probabilities summing to one; omitted isotopes receive zero probability. Explicit isotope labels, including `D`, stay fixed. Enrichment changes pattern probabilities, while `monoisotopic_mass`, `ion_mass`, and formula search continue to use reference principal-isotope masses.
 
@@ -257,6 +279,21 @@ matches = find_formula(59.0491;
 ```
 
 Atom-pool values are maximum counts. Results are `Compound` objects with `formula`, `ion`, `charge`, `mz`, and `ppm` fields, sorted by absolute ppm error. Formula strings use Hill ordering. Mass error is `1e6 * (observed_mz - calculated_mz)/calculated_mz`.
+
+The complete search defaults are:
+
+```julia
+matches = find_formula(58.0419;
+    tolerance_ppm=100, tolerance_da=0,
+    atom_pool=Dict("C"=>20, "H"=>100, "O"=>10, "N"=>10),
+    ion=IonSpec(), mode=:neutral,
+    constraints=SearchConstraints(), diagnostics=false,
+    heuristics=true, print=true, io=stdout)
+```
+
+`mz_input` accepts any `Real`, including integers. The atom pool is a
+`Dict{String,Int}`; include every element to be searched, since unspecified
+elements have a maximum count of zero.
 
 By default, for neutral closed-shell CHNO/halogen compositions, search requires integral, nonnegative `DBE = (2C + 2 + N - H - D - F - Cl - Br - I)/2`. Other element sets bypass this restricted valence model. Formula search is a candidate generator, not a general chemical-validity validator.
 
@@ -293,6 +330,14 @@ Explicit ratio intervals replace the corresponding default heuristic; a ratio wi
 
 `SearchResult` retains candidates and a snapshot of search settings. Diagnostic status is `:matched`, `:no_mass_match`, `:filtered_out`, or `:infeasible_ion`. `mass_matches` counts candidates inside the mass window **after atom-pool and atom-loss availability bounds**; rejected candidates are counted by their first failed constraint. It does not count every composition outside those bounds.
 
+Access these through `report.matches`, `report.settings`, and
+`report.diagnostics::SearchDiagnostics`. Rejection keys are `:minimum_atoms`,
+`:valence`, `:unsupported_dbe`, `:dbe`, `:ratios`, and `:heuristics`; absent keys
+mean zero rejections, so use `get(report.diagnostics.rejections, :valence, 0)`.
+`SearchConstraints()` defaults to empty minimum-count and ratio dictionaries,
+`dbe=nothing`, and `valence=:auto`. Intervals include both endpoints and may
+use infinite bounds.
+
 For a formula that already describes the ion, use `mode=:ion` with a charge-only specification:
 
 ```julia
@@ -327,6 +372,12 @@ end
 
 Use one local centroid cluster with finite nonnegative intensities, positive unique masses, and at least one nonzero intensity. Every candidate is evaluated against that same supplied cluster. Peak matching is ordered and one-to-one: maximize the number of pairs inside the matching window, then minimize summed squared normalized mass error. Missing predictions and unexplained measurements remain visible.
 
+`search_options` and `pattern_options` are named tuples and default to empty
+named tuples. Matching defaults are `match_tolerance_ppm=10` and
+`match_tolerance_da=0.001`, independent of the precursor search tolerance.
+Each pair must satisfy `abs(observed-predicted) ≤ max(match_tolerance_da,
+predicted*match_tolerance_ppm/1e6)`. Both tolerances must be finite and nonnegative.
+
 `RankedCandidate` returns:
 
 - The `Compound`, precursor mass error, and a separate mass score.
@@ -351,6 +402,11 @@ end
 ```
 
 `result_dict` exports `PatternResult`, `SearchResult`, or `RankedCandidate` as a JSON-safe schema-version-2 snapshot. It includes settings and isotope-table fingerprint. Infinite resolving power or open constraint bounds are stored as `"Inf"`/`"-Inf"`. This is an export format; automatic deserialization into Julia result objects is not provided.
+
+Each snapshot has top-level keys `"schema_version"` (currently `2`), `"kind"`
+(`"pattern"`, `"search"`, or `"ranked_candidate"`), and `"data"` (the result's
+fields). Dictionary keys and symbols become strings. To export several ranked
+candidates, use `result_dict.(ranked)` and serialize the resulting vector.
 
 Run [examples/isotope_assignment.jl](examples/isotope_assignment.jl) for a complete synthetic-data example:
 
